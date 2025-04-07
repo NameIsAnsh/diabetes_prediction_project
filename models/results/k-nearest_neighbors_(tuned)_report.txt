@@ -1,0 +1,16 @@
+K-Nearest Neighbors (Tuned) Classification Report
+
+              precision    recall  f1-score   support
+
+Non-Diabetic       0.78      0.85      0.81       150
+    Diabetic       0.66      0.56      0.60        81
+
+    accuracy                           0.74       231
+   macro avg       0.72      0.70      0.71       231
+weighted avg       0.74      0.74      0.74       231
+
+Accuracy: 0.7446
+Precision: 0.6618
+Recall: 0.5556
+F1 Score: 0.6040
+AUC: 0.8138

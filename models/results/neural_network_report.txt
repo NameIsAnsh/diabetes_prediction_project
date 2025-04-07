@@ -1,0 +1,16 @@
+Neural Network Classification Report
+
+              precision    recall  f1-score   support
+
+Non-Diabetic       0.78      0.81      0.79       150
+    Diabetic       0.62      0.57      0.59        81
+
+    accuracy                           0.73       231
+   macro avg       0.70      0.69      0.69       231
+weighted avg       0.72      0.73      0.72       231
+
+Accuracy: 0.7273
+Precision: 0.6216
+Recall: 0.5679
+F1 Score: 0.5935
+AUC: 0.7849

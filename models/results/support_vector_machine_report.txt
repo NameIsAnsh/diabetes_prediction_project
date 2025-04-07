@@ -1,0 +1,16 @@
+Support Vector Machine Classification Report
+
+              precision    recall  f1-score   support
+
+Non-Diabetic       0.77      0.87      0.82       150
+    Diabetic       0.68      0.51      0.58        81
+
+    accuracy                           0.74       231
+   macro avg       0.72      0.69      0.70       231
+weighted avg       0.74      0.74      0.73       231
+
+Accuracy: 0.7446
+Precision: 0.6833
+Recall: 0.5062
+F1 Score: 0.5816
+AUC: 0.8175
