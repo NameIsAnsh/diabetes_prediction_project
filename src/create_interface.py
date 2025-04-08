@@ -5,7 +5,7 @@
 Web Interface for Diabetes Prediction System
 """
 
-import pickle
+import joblib  # Replaces pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -24,12 +24,11 @@ st.set_page_config(
 
 # Load the prediction function
 models_dir = Path('models')
-with open(models_dir / 'predict_function.pkl', 'rb') as f:
-    predict_diabetes = pickle.load(f)
+predict_diabetes = joblib.load(models_dir / 'predict_function.pkl')
 
 # Load feature names
-with open(models_dir / 'feature_names.pkl', 'rb') as f:
-    feature_names = pickle.load(f)
+feature_names = joblib.load(models_dir / 'feature_names.pkl')
+
 
 # Copy visualization files to a static folder for the interface
 static_dir = Path('visualization/static')
