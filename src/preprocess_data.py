@@ -11,7 +11,7 @@ from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
-import pickle
+import joblib
 
 # Load the dataset
 data_path = Path('data/diabetes.csv')
@@ -72,14 +72,10 @@ np.save(output_dir / 'y_train.npy', y_train.values)
 np.save(output_dir / 'y_test.npy', y_test.values)
 
 # Save the preprocessing objects for later use
-with open(output_dir / 'imputer.pkl', 'wb') as f:
-    pickle.dump(imputer, f)
-
-with open(output_dir / 'scaler.pkl', 'wb') as f:
-    pickle.dump(scaler, f)
+joblib.dump(imputer, output_dir / 'imputer.pkl')
+joblib.dump(scaler, output_dir / 'scaler.pkl')
 
 # Save feature names for reference
-with open(output_dir / 'feature_names.pkl', 'wb') as f:
-    pickle.dump(X.columns.tolist(), f)
+joblib.dump(X.columns.tolist(), output_dir / 'feature_names.pkl')
 
 print("\nPreprocessing completed. Preprocessed data and objects saved to 'models' directory.")
