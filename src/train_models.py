@@ -7,7 +7,7 @@ Train Machine Learning Models for Diabetes Prediction
 
 import numpy as np
 import pandas as pd
-import pickle
+import joblib
 from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -32,8 +32,8 @@ y_train = np.load(models_dir / 'y_train.npy')
 y_test = np.load(models_dir / 'y_test.npy')
 
 # Load feature names
-with open(models_dir / 'feature_names.pkl', 'rb') as f:
-    feature_names = pickle.load(f)
+feature_names = joblib.load(models_dir / 'feature_names.pkl')
+
 
 print(f"Training data shape: {X_train.shape}")
 print(f"Testing data shape: {X_test.shape}")
@@ -237,9 +237,9 @@ print(f"Tuned {best_model['model_name']} F1 Score: {tuned_result['f1']:.4f}")
 print(f"Improvement: {(tuned_result['f1'] - best_model['f1']) * 100:.2f}%")
 
 # Save the final model
+
 final_model = tuned_model
-with open(models_dir / 'final_model.pkl', 'wb') as f:
-    pickle.dump(final_model, f)
+joblib.dump(final_model, models_dir / 'final_model.pkl')
 
 # Save model comparison results
 model_comparison = pd.DataFrame(results)
