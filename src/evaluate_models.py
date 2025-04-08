@@ -7,7 +7,7 @@ Model Evaluation and Performance Analysis for Diabetes Prediction
 
 import numpy as np
 import pandas as pd
-import pickle
+import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
@@ -32,13 +32,10 @@ X_test = np.load(models_dir / 'X_test.npy')
 y_train = np.load(models_dir / 'y_train.npy')
 y_test = np.load(models_dir / 'y_test.npy')
 
-# Load feature names
-with open(models_dir / 'feature_names.pkl', 'rb') as f:
-    feature_names = pickle.load(f)
+eature_names = joblib.load(models_dir / 'feature_names.pkl')
 
 # Load the final model
-with open(models_dir / 'final_model.pkl', 'rb') as f:
-    final_model = pickle.load(f)
+final_model = joblib.load(models_dir / 'final_model.pkl')
 
 # Load model comparison results
 model_comparison = pd.read_csv(results_dir / 'model_comparison.csv')
