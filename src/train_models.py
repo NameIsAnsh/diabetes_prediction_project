@@ -108,8 +108,8 @@ def evaluate_model(model, X_train, X_test, y_train, y_test, model_name):
             f.write(f"AUC: {auc:.4f}\n")
     
     # Save the model
-    with open(results_dir / f'{model_name.replace(" ", "_").lower()}_model.pkl', 'wb') as f:
-        pickle.dump(model, f)
+    joblib.dump(model, results_dir / f'{model_name.replace(" ", "_").lower()}_model.pkl')
+
     
     # Return metrics for comparison
     return {
