@@ -187,11 +187,8 @@ def predict_diabetes(features_dict):
         Dictionary with prediction results.
     """
     # Load preprocessing objects
-    with open(models_dir / 'imputer.pkl', 'rb') as f:
-        imputer = pickle.load(f)
-    
-    with open(models_dir / 'scaler.pkl', 'rb') as f:
-        scaler = pickle.load(f)
+    imputer = joblib.load(models_dir / 'imputer.pkl')
+    scaler = joblib.load(models_dir / 'scaler.pkl')
     
     # Create feature array in the correct order
     features = np.array([[features_dict[feature] for feature in feature_names]])
@@ -211,8 +208,8 @@ def predict_diabetes(features_dict):
     }
 
 # Save the prediction function
-with open(models_dir / 'predict_function.pkl', 'wb') as f:
-    pickle.dump(predict_diabetes, f)
+joblib.dump(predict_diabetes, models_dir / 'predict_function.pkl')
+
 
 # 7. Create a comprehensive evaluation report
 with open(evaluation_dir / 'model_evaluation_report.md', 'w') as f:
