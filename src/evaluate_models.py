@@ -15,7 +15,7 @@ from sklearn.metrics import roc_curve, precision_recall_curve, auc
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import learning_curve, validation_curve
 from sklearn.model_selection import cross_val_score, StratifiedKFold
-
+from utils import predict_diabetes 
 # Set style for plots
 plt.style.use('seaborn-v0_8-whitegrid')
 sns.set_palette('Set2')
