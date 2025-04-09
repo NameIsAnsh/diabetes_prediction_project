@@ -13,6 +13,7 @@ import seaborn as sns
 from pathlib import Path
 import streamlit as st
 import shutil
+from utils import predict_diabetes
 
 # Set page configuration
 st.set_page_config(
