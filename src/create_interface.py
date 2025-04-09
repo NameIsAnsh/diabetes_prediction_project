@@ -36,20 +36,22 @@ static_dir = Path('visualization/static')
 static_dir.mkdir(exist_ok=True, parents=True)
 
 # Copy key visualization files
+# In create_interface.py (replace the existing file-copying code)
 viz_files = [
-    'models/evaluation/comprehensive_model_comparison.png',
-    'models/evaluation/confusion_matrix_percent.png',
-    'models/evaluation/roc_curve.png',
-    'models/evaluation/precision_recall_curve.png',
-    'models/evaluation/learning_curve.png',
-    'visualization/correlation_heatmap.png',
-    'visualization/feature_distributions.png'
+    Path('models/evaluation/comprehensive_model_comparison.png'),
+    Path('models/evaluation/confusion_matrix_percent.png'),
+    Path('models/evaluation/roc_curve.png'),
+    Path('models/evaluation/precision_recall_curve.png'),
+    Path('models/evaluation/learning_curve.png'),
+    Path('visualization/correlation_heatmap.png'),
+    Path('visualization/feature_distributions.png')
 ]
 
-for file in viz_files:
-    src = Path(file)
-    if src.exists():
-        shutil.copy(src, static_dir)
+# Verify files exist before copying
+for src in viz_files:
+    if not src.exists():
+        raise FileNotFoundError(f"Missing visualization file: {src.resolve()}")
+    shutil.copy(src, static_dir)
 
 # Define the app
 def main():
