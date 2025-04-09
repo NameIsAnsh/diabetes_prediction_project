@@ -32,26 +32,26 @@ feature_names = joblib.load(models_dir / 'feature_names.pkl')
 
 
 # Copy visualization files to a static folder for the interface
-static_dir = Path(__file__).parent.parent / 'visualization' / 'static'
+static_dir = Path('visualization/static')
 static_dir.mkdir(exist_ok=True, parents=True)
 
 # Copy key visualization files
 # In create_interface.py (replace the existing file-copying code)
 viz_files = [
-    Path('models/evaluation/comprehensive_model_comparison.png'),
-    Path('models/evaluation/confusion_matrix_percent.png'),
-    Path('models/evaluation/roc_curve.png'),
-    Path('models/evaluation/precision_recall_curve.png'),
-    Path('models/evaluation/learning_curve.png'),
-    Path('visualization/correlation_heatmap.png'),
-    Path('visualization/feature_distributions.png')
+    'models/evaluation/comprehensive_model_comparison.png',
+     'models/evaluation/confusion_matrix_percent.png',
+     'models/evaluation/roc_curve.png',
+     'models/evaluation/precision_recall_curve.png',
+     'models/evaluation/learning_curve.png',
+     'visualization/correlation_heatmap.png',
+     'visualization/feature_distributions.png'
 ]
 
 # Verify files exist before copying
-for src in viz_files:
-    if not src.exists():
-        raise FileNotFoundError(f"Missing visualization file: {src.resolve()}")
-    shutil.copy(src, static_dir)
+for file in viz_files:
+     src = Path(file)
+     if src.exists():
+         shutil.copy(src, static_dir)
 
 # Define the app
 def main():
