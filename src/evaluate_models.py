@@ -32,7 +32,7 @@ X_test = np.load(models_dir / 'X_test.npy')
 y_train = np.load(models_dir / 'y_train.npy')
 y_test = np.load(models_dir / 'y_test.npy')
 
-eature_names = joblib.load(models_dir / 'feature_names.pkl')
+feature_names = joblib.load(models_dir / 'feature_names.pkl')
 
 # Load the final model
 final_model = joblib.load(models_dir / 'final_model.pkl')
