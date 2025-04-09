@@ -32,7 +32,7 @@ feature_names = joblib.load(models_dir / 'feature_names.pkl')
 
 
 # Copy visualization files to a static folder for the interface
-static_dir = Path('visualization/static')
+static_dir = Path(__file__).parent.parent / 'visualization' / 'static'
 static_dir.mkdir(exist_ok=True, parents=True)
 
 # Copy key visualization files
