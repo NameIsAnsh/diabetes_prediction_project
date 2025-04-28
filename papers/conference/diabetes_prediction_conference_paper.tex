@@ -14,29 +14,19 @@
 \title{Early Detection of Diabetes Risk Using Machine Learning: A Comparative Analysis of Classification Algorithms\\
 }
 
-\author{\IEEEauthorblockN{1\textsuperscript{st} Ms. Shilpa Karla Sahani}
-\IEEEauthorblockA{\textit{Department of Computer Science} \\
-\textit{Poornima College of engineering}\\
-City, Country \\
-email@domain.com}
-\and
-\IEEEauthorblockN{2\textsuperscript{nd} Author Name}
-\IEEEauthorblockA{\textit{Department of Computer Science} \\
-\textit{Poornima College of engineering}\\
-Jaipur, India \\
-email@domain.com}
-\and
-\IEEEauthorblockN{3\textsuperscript{rd} Anshul Sharma}
-\IEEEauthorblockA{\textit{Department of Computer Science} \\
-\textit{Poornima College of engineering}\\
-City, Country \\
-email@domain.com}
+\author{
+\IEEEauthorblockN{Ms. Shilpa Karla Sahani\textsuperscript{1}, Abhay Sharma\textsuperscript{2}, Anshul Sharma\textsuperscript{3}, Arjun Dadhich\textsuperscript{4}, Aadish Jain\textsuperscript{5}}
+\IEEEauthorblockA{
+\textit{Department of Computer Science}, \\
+\textit{Poornima College of Engineering}, Jaipur, India \\
+Emails: \{shilpa.sahani, 2022pcecsabhay003, 2022pcecsanshul017, 2022pcecsarjun020, 2022pcecsaadish001\}@poornima.org
+}
 }
 
 \maketitle
 
 \begin{abstract}
-Diabetes mellitus is a chronic metabolic disorder affecting millions worldwide, with its prevalence increasing at an alarming rate. Early detection and risk assessment are crucial for effective management and prevention of complications. This paper presents a comprehensive comparative analysis of various machine learning algorithms for diabetes risk prediction using the Pima Indians Diabetes Dataset. We implemented and evaluated six classification algorithms: Logistic Regression, Random Forest, Gradient Boosting, Support Vector Machine, K-Nearest Neighbors, and Neural Networks. Our methodology included data preprocessing techniques to handle missing values and feature scaling, followed by model training, hyperparameter tuning, and performance evaluation using metrics such as accuracy, precision, recall, F1-score, and AUC. The K-Nearest Neighbors algorithm achieved the best performance with an F1-score of 0.614 and accuracy of 74.46\% on the test set. Feature importance analysis revealed that glucose level, BMI, and age were the most significant predictors. Additionally, we developed a web-based interface for practical application of the prediction model in clinical settings. Our findings contribute to the growing body of research on machine learning applications in healthcare and provide insights for developing more accurate diabetes risk assessment tools.
+Diabetes mellitus is a long-term metabolic disorder that impacts millions of people globally, with its incidence growing at a rapid rate. Early diagnosis and risk evaluation are important for successful management and prevention of complications. This paper provides an extensive comparative study of different machine learning algorithms for predicting diabetes risk based on the Pima Indians Diabetes Dataset. We trained and compared six classification algorithms: Logistic Regression, Random Forest, Gradient Boosting, Support Vector Machine, K-Nearest Neighbors, and Neural Networks. Data preprocessing methods such as missing values handling and feature scaling were carried out as a part of our methodology, which was followed by training the model, hyperparameter optimization, and measuring performance in terms of metrics including accuracy, precision, recall, F1-score, and AUC. The K-Nearest Neighbors model performed the best with an F1-score of 0.614 and accuracy of 74.46\% on the test set. Feature importance analysis identified glucose level, BMI, and age as the most important predictors. We also created a web-based interface for hands-on application of the prediction model in medical practice. Our results join the increasing research on the applications of machine learning in healthcare and shed light on how more precise diabetes risk assessment tools can be developed.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -44,88 +34,88 @@ diabetes prediction, machine learning, classification algorithms, healthcare inf
 \end{IEEEkeywords}
 
 \section{Introduction}
-Diabetes mellitus is a chronic metabolic disorder characterized by elevated blood glucose levels resulting from defects in insulin secretion, insulin action, or both. According to the International Diabetes Federation, approximately 537 million adults (20-79 years) were living with diabetes in 2021, and this number is projected to rise to 643 million by 2030 and 783 million by 2045 \cite{idf2021}. The disease is associated with numerous complications including cardiovascular diseases, nephropathy, neuropathy, and retinopathy, which significantly impact quality of life and increase mortality risk.
+Diabetes mellitus is a chronic metabolic disorder associated with high blood sugar levels due to defects in insulin secretion, insulin action, or both. Based on the available data from the International Diabetes Federation, about 537 million adults (20-79 years) lived with diabetes in 2021, and this number is expected to increase to 643 million by 2030 and 783 million by 2045 \cite{idf2021}. The illness is linked to many complications like cardiovascular illnesses, nephropathy, neuropathy, and retinopathy that have a severe effect on the quality of life and raise mortality. 
 
-Early detection and risk assessment of diabetes are crucial for effective management and prevention of complications. Traditional diagnostic methods rely on clinical tests such as fasting plasma glucose, oral glucose tolerance test, and glycated hemoglobin (HbA1c). However, these methods are reactive rather than proactive, often detecting the disease after it has already developed. There is a growing need for predictive models that can identify individuals at high risk of developing diabetes before clinical manifestation, enabling timely interventions and preventive measures.
+Diabetes early detection and risk determination are essential to ensure effective treatment and prevention of complications. Standard diagnostic procedures use clinical tests like fasting plasma glucose, oral glucose tolerance test, and glycated hemoglobin (HbA1c). But these approaches are reactive and not proactive, tending to detect the disease once it has already occurred. There is an increasing demand for predictive models that can identify those at high risk of developing diabetes prior to clinical onset, allowing timely interventions and preventive strategies.
 
-Machine learning (ML) techniques have emerged as powerful tools for disease prediction and risk assessment in healthcare. These computational methods can analyze large volumes of data, identify complex patterns, and make predictions with high accuracy. In the context of diabetes, ML algorithms can process various patient attributes such as demographic information, clinical measurements, and lifestyle factors to predict the likelihood of developing the disease.
+Machine learning (ML) algorithms have proven to be potent agents for disease prediction and risk evaluation in the medical field. Such computer programs can sort through extensive amounts of information, recognize sophisticated patterns, and predict with a high degree of accuracy. For diabetes, ML programs can operate on diverse patient attributes including demographic data, clinical values, and lifestyle data to predict disease probability.
 
-Several studies have explored the application of ML for diabetes prediction using different algorithms and datasets. For instance, Maniruzzaman et al. \cite{maniruzzaman2017} compared various classification techniques including Gaussian Mixture Model, Logistic Regression, and Random Forest for diabetes prediction. Zou et al. \cite{zou2018} investigated the performance of Support Vector Machine (SVM) and Random Forest in predicting diabetes mellitus. Almahdawi et al. \cite{almahdawi2023} applied three classifiers—Multilayer Perceptron, K-Nearest Neighbors (KNN), and Random Forest—to a dataset of Iraqi patients, achieving up to 98.8\% accuracy.
+A few studies have investigated the use of ML for diabetes prediction based on various algorithms and datasets. For example, Maniruzzaman et al. \cite{maniruzzaman2017} compared several classification methods such as Gaussian Mixture Model, Logistic Regression, and Random Forest for the prediction of diabetes. Zou et al. \cite{zou2018} studied the prediction performance of Support Vector Machine (SVM) and Random Forest for diabetes mellitus. Almahdawi et al. \cite{almahdawi2023} used three classifiers—Multilayer Perceptron, K-Nearest Neighbors (KNN), and Random Forest—to an Iraqi patient dataset with an accuracy of up to 98.8%.
 
-Despite these advancements, there remains a need for comprehensive comparative analyses of different ML algorithms for diabetes prediction, particularly focusing on model interpretability, feature importance, and practical implementation in clinical settings. Additionally, most existing studies have limitations in terms of data preprocessing, handling of missing values, and rigorous evaluation methodologies.
+Despite these advances, a gap still exists in the availability of thorough comparative examinations of various ML algorithms for predicting diabetes, specifically with emphasis on model interpretability, feature importances, and real-world application in the clinic. Furthermore, most research works have deficiencies regarding data preprocessing, missing value management, and serious evaluation frameworks.
 
-This paper aims to address these gaps by presenting a thorough comparative analysis of six ML algorithms for diabetes risk prediction using the Pima Indians Diabetes Dataset. Our contributions include:
+This paper seeks to fill these gaps by providing a comprehensive comparative study of six ML algorithms for predicting diabetes risk based on the Pima Indians Diabetes Dataset. Our contributions are:
 
 \begin{itemize}
-    \item A systematic preprocessing approach to handle missing values and scale features appropriately
-    \item Implementation and evaluation of six classification algorithms: Logistic Regression, Random Forest, Gradient Boosting, SVM, KNN, and Neural Networks
-    \item Comprehensive performance assessment using multiple metrics including accuracy, precision, recall, F1-score, and Area Under the Receiver Operating Characteristic Curve (AUC)
-    \item Feature importance analysis to identify the most significant predictors of diabetes risk
-    \item Development of a web-based interface for practical application of the prediction model in clinical settings
+    \item A systematic preprocessing strategy to deal with missing values and scale features properly
+    \item Implementation and comparison of six classification algorithms: Logistic Regression, Random Forest, Gradient Boosting, SVM, KNN, and Neural Networks
+\item Integrate comprehensive performance evaluation using multiple metrics such as accuracy, precision, recall, F1-score, and Area Under the Receiver Operating Characteristic Curve (AUC)
+    \item Feature importance analysis to recognize the most prominent predictors of diabetes risk
+    \item Construction of a web interface for functional use of the prediction model in clinic settings
 \end{itemize}
 
-The remainder of this paper is organized as follows: Section II reviews related work in the field of diabetes prediction using ML. Section III describes the dataset and methodology, including data preprocessing, model implementation, and evaluation metrics. Section IV presents the experimental results and discussion. Section V concludes the paper and outlines directions for future research.
+The rest of this paper is structured as follows: Section II provides an overview of related work in the area of diabetes prediction with ML. Section III introduces the dataset and methodology, covering data preprocessing, model implementation, and evaluation metrics. Section IV discusses the experimental results and discussion. Section V concludes the paper and suggests future research directions.
 
 \section{Related Work}
-The application of machine learning for diabetes prediction has gained significant attention in recent years. This section reviews relevant studies that have employed various ML algorithms for diabetes risk assessment and prediction.
+The use of machine learning in diabetes prediction has, in the recent past, been very much in the limelight. This section discusses pertinent studies that have utilized different ML algorithms to predict diabetes risk and diabetes itself.
 
 \subsection{Machine Learning Approaches for Diabetes Prediction}
-Numerous studies have explored different ML approaches for diabetes prediction. Perveen et al. \cite{perveen2016} evaluated the performance of various data mining classification techniques including Naive Bayes, Decision Tree, and Random Forest for diabetes prediction. Their results showed that AdaBoost ensemble with Random Forest achieved the highest accuracy of 81.97\%.
+Various ML methods for diabetes prediction have been investigated in several studies. Perveen et al. \cite{perveen2016} compared the performance of several data mining classification algorithms such as Naive Bayes, Decision Tree, and Random Forest for predicting diabetes. Their findings indicated that AdaBoost ensemble with Random Forest had the best accuracy of 81.97%.
 
-Maniruzzaman et al. \cite{maniruzzaman2017} conducted a comparative study of classification techniques for diabetes prediction, including Gaussian Mixture Model, Linear Discriminant Analysis, Quadratic Discriminant Analysis, Logistic Regression, and Random Forest. They found that Gaussian Mixture Model outperformed other methods with an accuracy of 82.0\%.
+Maniruzzaman et al. \cite{maniruzzaman2017} compared classification methods for diabetes prediction, such as Gaussian Mixture Model, Linear Discriminant Analysis, Quadratic Discriminant Analysis, Logistic Regression, and Random Forest. They concluded that Gaussian Mixture Model performed better than other approaches with 82.0\\\% accuracy.
 
-Zou et al. \cite{zou2018} investigated the performance of SVM and Random Forest in predicting diabetes mellitus, reporting that SVM achieved better results with an accuracy of 83.8\%. Similarly, Sisodia and Sisodia \cite{sisodia2018} compared Naive Bayes, Decision Tree, and SVM for diabetes prediction, with Naive Bayes showing the highest accuracy of 76.3\%.
+Zou et al. \cite{zou2018} compared the performance of SVM and Random Forest in diabetes mellitus prediction and stated that SVM performed with a higher accuracy of 83.8\%. Likewise, Sisodia and Sisodia \cite{sisodia2018} compared Naive Bayes, Decision Tree, and SVM in predicting diabetes and Naive Bayes had the maximum accuracy of 76.3\%.
 
-More recently, Almahdawi et al. \cite{almahdawi2023} applied three classifiers—Multilayer Perceptron, KNN, and Random Forest—to a dataset of Iraqi patients. Their study involved two experiments: one using all 12 features of the dataset and another using only five attributes. The Random Forest algorithm outperformed others with 98.8\% accuracy in the first experiment, while the second experiment showed improvement in the performance of KNN and Multilayer Perceptron.
+Recently, Almahdawi et al. \cite{almahdawi2023} used three classifiers—Multilayer Perceptron, KNN, and Random Forest—to a set of Iraqi patients' data. They conducted two experiments: the first using all 12 attributes of the data set and the second using only five features. The Random Forest model performed better than others with 98.8\% accuracy in the first experiment, and in the second experiment, improvement was seen in the performance of KNN and Multilayer Perceptron.
 
-Uddin and Ali \cite{uddin2023} compared various ML techniques including Logistic Regression, XGBoost, AdaBoost, SVM, Random Forest, KNN, and Artificial Neural Networks for diabetes prediction. Their findings demonstrated that Random Forest achieved the highest accuracy of 89.9\%, precision of 84.5\%, recall of 90.4\%, and F1-score of 87.3\%.
+Uddin and Ali \cite{uddin2023} made a comparison of different ML methods such as Logistic Regression, XGBoost, AdaBoost, SVM, Random Forest, KNN, and Artificial Neural Networks for predicting diabetes. Their results showed that Random Forest attained the maximum accuracy of 89.9\%, precision of 84.5\%, recall of 90.4\%, and F1-score of 87.3\%.
 
 \subsection{Feature Selection and Importance}
-Feature selection and importance analysis have been recognized as crucial aspects of diabetes prediction models. Kavakiotis et al. \cite{kavakiotis2017} conducted a comprehensive review of ML and data mining approaches in diabetes research, highlighting the significance of feature selection in improving model performance.
+Importance analysis and feature selection have also been identified as important components of diabetes prediction models. Kavakiotis et al. \cite{kavakiotis2017} presented an extensive review of ML and data mining techniques for diabetes research with the importance of feature selection as a key performance improvement factor.
 
-Lai et al. \cite{lai2019} developed predictive models for diabetes using ML techniques and identified key features that contribute significantly to prediction accuracy. Their study emphasized the importance of glucose level, BMI, age, and family history as strong predictors of diabetes risk.
+Lai et al. \cite{lai2019} created diabetes predictive models utilizing ML methods and determined significant features that play important roles in the accuracy of predictions. Their work highlighted glucose level, BMI, age, and family history as significant predictors of diabetes risk.
 
-Sneha and Gangil \cite{sneha2019} focused on optimal feature selection for early prediction of diabetes mellitus. They employed correlation-based feature selection and wrapper methods to identify the most relevant attributes, which improved the accuracy of their prediction models.
+Sneha and Gangil \cite{sneha2019} concentrated on optimal feature selection for early diabetes mellitus prediction. They utilized correlation-based feature selection along with wrapper approaches to determine the most significant attributes, which enhanced the precision of their prediction models.
 
 \subsection{Practical Implementation and Clinical Applications}
-Several studies have addressed the practical implementation of ML models for diabetes prediction in clinical settings. Naz and Bhatia \cite{naz2023} developed a diabetes prediction system using ML with a web application interface, making the prediction model accessible to healthcare providers and patients.
+A number of studies have explored the real-world application of ML models for predicting diabetes in clinical practice. Naz and Bhatia \cite{naz2023} designed a diabetes prediction system based on ML with a web application interface, which allowed the prediction model to be accessible to healthcare professionals and patients.
 
-Islam et al. \cite{islam2018} explored the application of ML algorithms in healthcare for diabetes prediction, emphasizing the potential of these technologies to support clinical decision-making and improve patient outcomes.
+Islam et al. \cite{islam2018} researched the use of ML algorithms in healthcare for diabetic prediction, with a focus on the potential use of these technologies to aid in clinical decision-making and enhance patient outcomes.
 
-Sarwar et al. \cite{sarwar2024} proposed an enhanced and optimized Deep Reinforcement Learning-Convolutional Neural Network (DRL-CNN) algorithm for diabetes prediction, achieving high accuracy and demonstrating the potential of advanced deep learning techniques in this domain.
+Sarwar et al. \cite{sarwar2024} introduced a novel and improved Deep Reinforcement Learning-Convolutional Neural Network (DRL-CNN) algorithm for diabetic prediction and obtained high accuracy and the high potential of future advanced deep learning methods in this area.
 
 \subsection{Research Gaps and Our Contribution}
-Despite the significant progress in applying ML for diabetes prediction, several gaps remain in the existing literature:
+In spite of tremendous strides in the use of ML for diabetes prediction, a number of gaps exist in current literature:
 
 \begin{itemize}
-    \item Limited comprehensive comparisons of multiple ML algorithms using consistent preprocessing and evaluation methodologies
-    \item Insufficient attention to handling missing values and data imbalance issues
-    \item Lack of detailed feature importance analysis across different algorithms
-    \item Few studies addressing the practical implementation of prediction models in clinical settings
+    \item Limited in-depth comparisons between several ML algorithms with identical preprocessing and evaluation approaches
+    \item Inadequate consideration of missing value and data imbalance handling
+    \item Inability to provide detailed feature importance analysis across various algorithms
+\item Minimum research on using prediction models within clinical practice
 \end{itemize}
 
-Our work aims to address these gaps by providing a thorough comparative analysis of six ML algorithms, implementing robust preprocessing techniques, conducting detailed feature importance analysis, and developing a practical web-based interface for clinical application.
+Our research has the goal to fill these spaces by presenting in-depth comparative research of six machine learning algorithms, applying strong preprocessing methods, presenting extensive feature importance analysis, and creating a practicable web application for clinical deployment.
 
 \section{Methodology}
 This section describes the dataset, preprocessing techniques, machine learning algorithms, and evaluation metrics used in our study.
 
 \subsection{Dataset Description}
-We used the Pima Indians Diabetes Dataset, which is widely used for diabetes prediction research. The dataset contains medical and demographic data of 768 female patients of Pima Indian heritage, aged 21 years and older. Each record includes eight features and a binary outcome variable indicating the presence or absence of diabetes.
+We applied the Pima Indians Diabetes Dataset, commonly applied in research concerning diabetes prediction. The data provide medical and demographic information about 768 female Pima Indian patients aged at least 21 years. Each data record has eight attributes and one binary outcome feature representing whether a patient has diabetes or not.
 
-The features in the dataset are:
+The dataset has the following attributes:
 \begin{itemize}
     \item Pregnancies: Number of times pregnant
-    \item Glucose: Plasma glucose concentration after a 2-hour oral glucose tolerance test
-    \item BloodPressure: Diastolic blood pressure (mm Hg)
-    \item SkinThickness: Triceps skin fold thickness (mm)
-    \item Insulin: 2-Hour serum insulin (mu U/ml)
-    \item BMI: Body mass index (weight in kg/(height in m)²)
-    \item DiabetesPedigreeFunction: Diabetes pedigree function (a function that scores likelihood of diabetes based on family history)
+\\item Glucose: Concentration of glucose in the plasma following an oral glucose tolerance test for 2 hours
+    \\item BloodPressure: Diastolic blood pressure in mm Hg
+    \\item SkinThickness: Thickness of triceps skin fold in mm
+    \\item Insulin: 2-Hour serum insulin in mu U/ml
+    \\item BMI: Body mass index in weight in kg/(height in m)²
+\item DiabetesPedigreeFunction: Diabetes pedigree function (a function that scores likelihood of diabetes based on family history)
     \item Age: Age in years
     \item Outcome: Class variable (0: non-diabetic, 1: diabetic)
-\end{itemize}
+\\end{itemize}
 
-The dataset has 268 positive cases (34.9\%) and 500 negative cases (65.1\%), indicating a class imbalance that needs to be addressed during model development.
+There are 268 positive instances (34.9\%) and 500 negative instances (65.1\%), representing a class imbalance that must be handled during model development.
 
 \subsection{Data Preprocessing}
 Data preprocessing is a crucial step in developing accurate ML models. Our preprocessing pipeline included the following steps:
@@ -160,25 +150,25 @@ z = \frac{x - \mu}{\sigma}
 where $x$ is the original feature value, $\mu$ is the mean of the feature, and $\sigma$ is the standard deviation.
 
 \subsection{Machine Learning Algorithms}
-We implemented and evaluated six classification algorithms for diabetes prediction:
+We applied and tested six classification models for diabetes prediction:
 
 \subsubsection{Logistic Regression (LR)}
-Logistic Regression is a statistical method that models the probability of a binary outcome using a logistic function. We used L2 regularization (Ridge) to prevent overfitting and set the maximum number of iterations to 1000 for convergence.
+Logistic Regression is a statistical model that describes the probability of a binary outcome through a logistic function. We employed L2 regularization (Ridge) to avoid overfitting and specified the maximum number of iterations as 1000 for convergence.
 
 \subsubsection{Random Forest (RF)}
-Random Forest is an ensemble learning method that constructs multiple decision trees during training and outputs the class that is the mode of the classes of individual trees. We used 100 trees in the forest with a maximum depth of 10 to balance model complexity and performance.
+Random Forest is a type of ensemble learning that builds a set of decision trees at training time and takes the class which is the mode of classes of a set of individual trees. We employed 100 trees in the forest with a depth of 10 to trade off complexity and performance of the model.
 
 \subsubsection{Gradient Boosting (GB)}
-Gradient Boosting is another ensemble technique that builds trees sequentially, with each tree correcting the errors of its predecessors. We implemented Gradient Boosting with 100 estimators, a learning rate of 0.1, and a maximum depth of 3 for each tree.
+Gradient Boosting is yet another ensemble method that constructs trees sequentially, where each tree tries to rectify the mistakes of the previous ones. We used Gradient Boosting with 100 estimators, learning rate 0.1, and max depth as 3 for every tree.
 
 \subsubsection{Support Vector Machine (SVM)}
-Support Vector Machine finds the hyperplane that best separates the classes in the feature space. We used a Radial Basis Function (RBF) kernel with C=1.0 and gamma='scale' to handle non-linear relationships in the data.
+Support Vector Machine identifies the best hyperplane separating the classes in the feature space. We utilized a Radial Basis Function (RBF) kernel with C=1.0 and gamma='scale' to accommodate non-linear data relationships.
 
 \subsubsection{K-Nearest Neighbors (KNN)}
-K-Nearest Neighbors classifies a data point based on the majority class of its k nearest neighbors in the feature space. We implemented KNN with k=9 (determined through hyperparameter tuning) and uniform weights.
+K-Nearest Neighbors classifies a point according to the majority class of its k nearest neighbors in the feature space. We employed KNN with k=9 (optimized using hyperparameter tuning) and uniform weights.
 
 \subsubsection{Neural Network (NN)}
-We implemented a Multilayer Perceptron neural network with two hidden layers (100 and 50 neurons, respectively), ReLU activation function, and Adam optimizer. The network was trained for 1000 epochs with a learning rate of 0.001.
+We used a two-hidden-layered Multilayer Perceptron neural network (100 neurons and 50 neurons, respectively), ReLU activation, and Adam optimizer. The network was trained for 1000 epochs at a learning rate of 0.001.
 
 \subsection{Model Evaluation}
 We evaluated the performance of each algorithm using multiple metrics to provide a comprehensive assessment:
@@ -280,81 +270,78 @@ Fig. 1 shows the confusion matrix for the best-performing model (KNN) on the tes
 The confusion matrix reveals that the model correctly identified 114 out of 150 non-diabetic cases (76.0\%) and 47 out of 81 diabetic cases (58.0%). The relatively high false negative rate (34 out of 81 diabetic cases, or 42.0\%) is a concern in a medical context, as it represents missed diagnoses of diabetes. This suggests that while the model performs reasonably well overall, there is room for improvement in detecting positive cases.
 
 \subsection{Feature Importance Analysis}
-Fig. 2 illustrates the importance of each feature in the Random Forest model, which provides interpretable feature importance scores.
 
-The feature importance analysis revealed that Glucose was the most significant predictor of diabetes, followed by BMI and Age. This aligns with clinical knowledge, as elevated blood glucose levels are directly related to diabetes, and higher BMI and age are known risk factors. The Diabetes Pedigree Function, which represents family history, was also an important predictor, consistent with the hereditary nature of type 2 diabetes.
+The feature importance score showed that Glucose was the strongest predictor for diabetes, then BMI and Age. This corresponds with clinical practice, as increased blood glucose levels are directly linked to diabetes and increased BMI and age are recognized risk factors. The Diabetes Pedigree Function, a measure of family history, was also a strong predictor, in keeping with the inherited nature of type 2 diabetes.
 
 \subsection{ROC and Precision-Recall Curves}
-Fig. 3 shows the Receiver Operating Characteristic (ROC) curve for the KNN model, with an AUC of 0.8034.
 
-The ROC curve demonstrates the model's ability to distinguish between diabetic and non-diabetic cases across different threshold settings. The AUC of 0.8034 indicates good discriminative power, with the model performing significantly better than random chance (AUC = 0.5).
+ROC curve illustrates the model's discriminative capacity for diabetic vs. non-diabetic cases at various threshold settings. The AUC of 0.8034 signifies good discriminability, with the model significantly outperforming random chance (AUC = 0.5).
 
-Fig. 4 presents the Precision-Recall curve, which is particularly informative for imbalanced datasets like ours.
 
-The Precision-Recall curve shows the trade-off between precision and recall at different threshold values. The area under this curve (PR-AUC) was 0.6723, indicating moderate performance in balancing precision and recall, which is challenging given the class imbalance in the dataset.
+Precision-Recall curve demonstrates the balance between precision and recall at varying threshold values. Area under this curve (PR-AUC) was 0.6723, reflecting moderate performance in achieving balance between precision and recall considering the class imbalance of the dataset.
 
 \subsection{Learning Curve Analysis}
-Fig. 5 displays the learning curve for the KNN model, showing how performance changes with increasing training set size.
+The learning curve illustrates that both cross-validation and training scores level off as the size of the training set grows, with a narrow gap between them. This indicates that the model is not significantly underfitting nor overfitting. Nevertheless, the plateauing of the performance shows that increasing the data of the same kind may not significantly enhance the performance of the model, and alternative methods like feature engineering or ensemble techniques may be required.
 
-The learning curve shows that both training and cross-validation scores stabilize as the training set size increases, with a small gap between them. This suggests that the model is neither underfitting nor overfitting significantly. However, the plateau in performance indicates that adding more data of similar characteristics might not substantially improve the model's performance, and other approaches such as feature engineering or ensemble methods might be needed.
 
 \subsection{Cross-Validation Results}
-We performed 5-fold cross-validation to assess the model's stability and generalization ability. The KNN model achieved a mean cross-validation F1-score of 0.6135 with a standard deviation of 0.0655, indicating reasonable stability across different data subsets.
+We conducted 5-fold cross-validation to measure the stability and generalization capability of the model. The KNN model yielded a mean cross-validation F1-score of 0.6135 with a standard deviation of 0.0655, reflecting moderate stability across various subsets of data.
 
 \subsection{Web Interface for Diabetes Prediction}
-We developed a web-based interface using Streamlit to make our prediction model accessible for practical use. The interface includes:
+We created a web interface with Streamlit to make our prediction model usable in practice. The interface contains:
 
 \begin{itemize}
-    \item Input fields for patient data (Pregnancies, Glucose, Blood Pressure, etc.)
-    \item Prediction results with probability and risk level (Low, Medium, High)
-    \item Recommendations based on the predicted risk level
+    \item Input fields for patient information (Pregnancies, Glucose, Blood Pressure, etc.)
+    \item Prediction output with probability and risk level (Low, Medium, High)
+    \item Recommendations depending on the predicted risk level
     \item Visualizations of model performance and feature importance
 \end{itemize}
 
-The interface provides a user-friendly way for healthcare providers to use the prediction model in clinical settings, potentially aiding in early diabetes risk assessment and intervention.
+The interface offers a friendly means through which healthcare workers can apply the prediction model at the clinical level, possibly useful for early risk assessment and treatment of diabetes.
 
 \subsection{Discussion}
-Our comparative analysis of six ML algorithms for diabetes prediction yielded several important findings:
+Our comparison of six ML models for diabetes prediction produced the following key results:
 
 \begin{itemize}
-    \item KNN achieved the highest F1-score (0.6144), making it the best-performing algorithm overall when considering the balance between precision and recall.
-    \item Logistic Regression showed the highest AUC (0.8363), indicating good discrimination ability across different threshold settings.
-    \item Random Forest had the highest accuracy (0.7489) but slightly lower recall compared to KNN.
-    \item Glucose level, BMI, and Age were identified as the most significant predictors of diabetes risk, aligning with clinical knowledge.
-    \item The relatively high false negative rate (42.0\% of diabetic cases) suggests room for improvement in detecting positive cases.
+    \item KNN had the best F1-score of 0.6144 and was, therefore, the overall top-performing algorithm in terms of precision-recall balance.
+    \item Logistic Regression had the best AUC of 0.8363, which indicated good discrimination capacity on varying threshold settings.
+\end{itemize}.
+\item Random Forest was the most accurate (0.7489) but had slightly lower recall than KNN.
+    \item Glucose level, BMI, and Age were found to be the strongest predictors of diabetes risk, consistent with clinical experience.
+    \item The fairly high false negative rate (42.0\% of diabetic cases) indicates potential for improvement in identifying positive cases.
 \end{itemize}
 
-These results are comparable to those reported in the literature. For instance, Perveen et al. \cite{perveen2016} achieved an accuracy of 81.97\% using AdaBoost with Random Forest, while Zou et al. \cite{zou2018} reported 83.8\% accuracy with SVM. Our models showed slightly lower accuracy (74.46-74.89\%), which could be attributed to our rigorous handling of missing values and the use of a separate test set for evaluation, providing a more realistic assessment of model performance.
+These findings are in line with what has been published in the literature. For example, Perveen et al. \cite{perveen2016} obtained a classification accuracy of 81.97\% with AdaBoost on Random Forest, whereas Zou et al. \cite{zou2018} attained 83.8\% accuracy with SVM. Our models registered slightly lower accuracy (74.46-74.89\%), which may be due to our careful treatment of missing values and the use of an independent test set for assessment, giving a better estimate of model performance.
 
-The performance of our models is also influenced by the characteristics of the Pima Indians Diabetes Dataset, which has several limitations:
+Our models' performance is also affected by the nature of the Pima Indians Diabetes Dataset, which also has various shortcomings:
 
 \begin{itemize}
-    \item Limited sample size (768 instances)
+    \item Small sample size (768 examples)
     \item Class imbalance (34.9\% diabetic, 65.1\% non-diabetic)
-    \item High proportion of missing values in some features (e.g., 48.70\% in Insulin)
-    \item Restricted to female patients of Pima Indian heritage, limiting generalizability
+    \item High percentage of missing values in certain features (e.g., 48.70\% in Insulin)
+\item Limited to female Pima Indian patients, precluding generalizability
 \end{itemize}
 
-Despite these limitations, our study demonstrates the potential of ML algorithms for diabetes risk prediction and provides insights for developing more accurate and practical prediction models.
+Despite these limitations, our research shows the promise of ML algorithms for predicting diabetes risk and offers suggestions for the development of more accurate and useful prediction models.
 
 \section{Conclusion and Future Work}
-This paper presented a comprehensive comparative analysis of six machine learning algorithms for diabetes risk prediction using the Pima Indians Diabetes Dataset. We implemented a systematic preprocessing approach, evaluated model performance using multiple metrics, conducted feature importance analysis, and developed a web-based interface for practical application.
+This article introduced a holistic comparative study of six machine learning models for predicting diabetes risk through the Pima Indians Diabetes Dataset. We utilized a systematic preprocessing strategy, performed model evaluation by employing various metrics, carried out feature importance analysis, and designed a web interface for real-world usage.
 
-Our findings indicate that the K-Nearest Neighbors algorithm achieved the best overall performance with an F1-score of 0.6144 and accuracy of 74.46\% on the test set. Feature importance analysis revealed that glucose level, BMI, and age were the most significant predictors of diabetes risk, aligning with clinical knowledge.
+Our results suggest that the K-Nearest Neighbors algorithm performed the best across all parameters with an F1-score of 0.6144 and accuracy of 74.46\% on the test set. The feature importance analysis showed that glucose level, BMI, and age were found to be the strongest predictors of diabetes risk, consistent with clinical experience.
 
-The results of this study contribute to the growing body of research on machine learning applications in healthcare and provide insights for developing more accurate diabetes risk assessment tools. The web-based interface we developed demonstrates the potential for practical implementation of ML models in clinical settings, potentially aiding in early diabetes risk assessment and intervention.
+The results of this study contribute to the growing body of research on machine learning applications in healthcare and provide insights for developing more precise diabetes risk assessment tools. The web-based interface we built shows the potential for practical use of ML models in clinical environments, possibly helping with early diabetes risk assessment and intervention.
 
-Future work could focus on several directions:
+Future research could be directed towards the following:
 
 \begin{itemize}
-    \item Exploring advanced ensemble methods and deep learning approaches to improve prediction accuracy
-    \item Incorporating additional features such as lifestyle factors, dietary habits, and genetic markers
-    \item Addressing the class imbalance issue using techniques such as SMOTE (Synthetic Minority Over-sampling Technique)
-    \item Validating the models on larger and more diverse datasets to enhance generalizability
-    \item Conducting prospective studies to evaluate the clinical impact of the prediction models in real-world settings
+\item Investigating advanced ensemble techniques and deep learning methods to enhance the accuracy of predictions
+    \item Adding more features like lifestyle factors, diet, and genetic markers
+    \item Resolving the class imbalance problem with methods like SMOTE (Synthetic Minority Over-sampling Technique)
+    \item Testing the models on larger and more diverse datasets to improve generalizability
+\item Performing prospective studies to assess the clinical effect of the prediction models in clinical practice
 \end{itemize}
 
-By advancing research in these areas, we can develop more accurate and practical tools for diabetes risk prediction, contributing to early detection and prevention of this increasingly prevalent chronic disease.
+Through improving research in these fields, we can establish more precise and applicable tools for diabetes risk prediction, leading to early detection and prevention of this rapidly growing chronic disease.
 
 \begin{thebibliography}{00}
 \bibitem{idf2021} International Diabetes Federation, "IDF Diabetes Atlas, 10th edition," 2021. [Online]. Available: https://diabetesatlas.org/
