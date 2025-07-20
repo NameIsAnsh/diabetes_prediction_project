@@ -25,49 +25,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Prediction Model Loading ---
-# FIX: Define a placeholder function in the global scope.
-# This is necessary because the .pkl file was created with a reference
-# to a function named 'predict_diabetes'. Joblib needs to find a function
-# with this name in the current script to successfully load the file.
-def predict_diabetes(input_data):
-    """
-    This is a placeholder. The actual function is loaded from 'predict_function.pkl'.
-    It will be overwritten by the real function after loading.
-    """
-    raise NotImplementedError("Prediction function was not loaded correctly.")
-
-# FIX: Use Streamlit's caching to load the model assets robustly and only once.
-@st.cache_resource
-def load_model_assets():
-    """
-    Loads the saved prediction function and feature names using caching.
-    Returns the prediction function and feature names, or (None, None) if files are missing.
-    """
-    try:
-        models_dir = Path('models')
-        # The load call will now succeed because the placeholder function exists globally.
-        prediction_function = joblib.load(models_dir / 'predict_function.pkl')
-        feature_names_list = joblib.load(models_dir / 'feature_names.pkl')
-        return prediction_function, feature_names_list
-    except FileNotFoundError:
-        st.error("Model files not found. Please ensure 'predict_function.pkl' and 'feature_names.pkl' are in a 'models' directory.")
-        return None, None
-    except Exception as e:
-        st.error(f"An error occurred while loading the model: {e}")
-        st.info("This can happen if the Python environment or library versions differ from where the model was saved.")
-        return None, None
+# --- NOTE: Model loading is now handled directly inside the prediction function ---
+# This is a more direct approach to avoid issues with Streamlit's script re-runs.
 
 # Define the app
 def main():
-    # Load the model assets inside the main function.
-    # This ensures they are loaded correctly before being used.
-    prediction_function, feature_names = load_model_assets()
-
-    # Stop the app if the model assets could not be loaded
-    if prediction_function is None or feature_names is None:
-        st.stop()
-
     # Sidebar
     st.sidebar.image("https://img.freepik.com/free-vector/diabetes-round-concept_1284-37921.jpg", width=200)
     st.sidebar.title("Navigation")
@@ -76,8 +38,8 @@ def main():
     if page == "Home":
         show_home()
     elif page == "Prediction Tool":
-        # Pass the loaded function as an argument.
-        show_prediction_tool(prediction_function)
+        # The prediction function is no longer passed as an argument.
+        show_prediction_tool()
     elif page == "Model Performance":
         show_model_performance()
     else:
@@ -127,8 +89,8 @@ def show_home():
     Use the prediction tool to assess your personal risk based on these and other factors.
     """)
 
-# FIX: The function now accepts the loaded prediction function as an argument.
-def show_prediction_tool(predict_diabetes_func):
+# FIX: The function now loads the model directly when needed.
+def show_prediction_tool():
     st.title("Diabetes Risk Prediction Tool")
     st.markdown("Enter your health information below to get a personalized diabetes risk assessment.")
     
@@ -160,84 +122,91 @@ def show_prediction_tool(predict_diabetes_func):
     
     # Add predict button
     if st.button("Predict Diabetes Risk"):
-        # Make prediction using the function passed as an argument.
-        result = predict_diabetes_func(input_data)
-        
-        # Display result
-        st.markdown("## Prediction Result")
-        
-        # Create columns for result display
-        res_col1, res_col2 = st.columns([1, 2])
-        
-        with res_col1:
-            if result['prediction'] == 1:
-                st.error("**Prediction: Positive for Diabetes Risk**")
-            else:
-                st.success("**Prediction: Negative for Diabetes Risk**")
+        try:
+            # Load the placeholder function definition to satisfy joblib
+            def predict_diabetes(input_data):
+                pass
             
-            st.metric("Risk Probability", f"{result['probability']:.2%}")
+            # Load the actual function from the file right before using it.
+            models_dir = Path('models')
+            predict_diabetes_func = joblib.load(models_dir / 'predict_function.pkl')
             
-            # Risk level with color coding
-            if result['risk_level'] == 'High':
-                st.markdown("**Risk Level:** 🔴 High")
-            elif result['risk_level'] == 'Medium':
-                st.markdown("**Risk Level:** 🟠 Medium")
-            else:
-                st.markdown("**Risk Level:** 🟢 Low")
-        
-        with res_col2:
-            # Recommendations based on risk level
-            st.markdown("### Recommendations")
+            # Make prediction using the loaded function.
+            result = predict_diabetes_func(input_data)
             
-            if result['risk_level'] == 'High':
-                st.markdown("""
-                - **Consult a healthcare provider immediately** for proper diagnosis and treatment
-                - Monitor your blood glucose levels regularly
-                - Adopt a balanced diet low in sugar and refined carbohydrates
-                - Engage in regular physical activity
-                - Maintain a healthy weight
-                """)
-            elif result['risk_level'] == 'Medium':
-                st.markdown("""
-                - **Schedule a check-up** with your healthcare provider
-                - Consider getting tested for prediabetes
-                - Reduce sugar and refined carbohydrate intake
-                - Increase physical activity to at least 150 minutes per week
-                - Aim for a healthy weight
-                """)
-            else:
-                st.markdown("""
-                - Continue maintaining a healthy lifestyle
-                - Get regular check-ups with your healthcare provider
-                - Stay physically active
-                - Eat a balanced diet
-                - Monitor your weight
-                """)
-        
-        # Display a gauge chart for the risk probability
-        fig, ax = plt.subplots(figsize=(10, 2))
-        ax.set_xlim(0, 1)
-        ax.set_ylim(0, 1)
-        ax.set_title('Diabetes Risk Probability')
-        ax.set_xticks([0, 0.3, 0.7, 1])
-        ax.set_xticklabels(['0%', '30%', '70%', '100%'])
-        ax.set_yticks([])
-        
-        # Add colored regions
-        ax.axvspan(0, 0.3, color='green', alpha=0.3)
-        ax.axvspan(0.3, 0.7, color='orange', alpha=0.3)
-        ax.axvspan(0.7, 1, color='red', alpha=0.3)
-        
-        # Add marker for the predicted probability
-        ax.plot(result['probability'], 0.5, 'ko', markersize=12)
-        
-        st.pyplot(fig)
-        
-        # Disclaimer
-        st.markdown("""
-        **Disclaimer:** This tool provides an estimate of diabetes risk based on machine learning models. 
-        It is not a medical diagnosis. Always consult with healthcare professionals for proper medical advice and diagnosis.
-        """)
+            # Display result
+            st.markdown("## Prediction Result")
+            
+            res_col1, res_col2 = st.columns([1, 2])
+            
+            with res_col1:
+                if result['prediction'] == 1:
+                    st.error("**Prediction: Positive for Diabetes Risk**")
+                else:
+                    st.success("**Prediction: Negative for Diabetes Risk**")
+                
+                st.metric("Risk Probability", f"{result['probability']:.2%}")
+                
+                if result['risk_level'] == 'High':
+                    st.markdown("**Risk Level:** 🔴 High")
+                elif result['risk_level'] == 'Medium':
+                    st.markdown("**Risk Level:** 🟠 Medium")
+                else:
+                    st.markdown("**Risk Level:** 🟢 Low")
+            
+            with res_col2:
+                st.markdown("### Recommendations")
+                
+                if result['risk_level'] == 'High':
+                    st.markdown("""
+                    - **Consult a healthcare provider immediately** for proper diagnosis and treatment
+                    - Monitor your blood glucose levels regularly
+                    - Adopt a balanced diet low in sugar and refined carbohydrates
+                    - Engage in regular physical activity
+                    - Maintain a healthy weight
+                    """)
+                elif result['risk_level'] == 'Medium':
+                    st.markdown("""
+                    - **Schedule a check-up** with your healthcare provider
+                    - Consider getting tested for prediabetes
+                    - Reduce sugar and refined carbohydrate intake
+                    - Increase physical activity to at least 150 minutes per week
+                    - Aim for a healthy weight
+                    """)
+                else:
+                    st.markdown("""
+                    - Continue maintaining a healthy lifestyle
+                    - Get regular check-ups with your healthcare provider
+                    - Stay physically active
+                    - Eat a balanced diet
+                    - Monitor your weight
+                    """)
+            
+            fig, ax = plt.subplots(figsize=(10, 2))
+            ax.set_xlim(0, 1)
+            ax.set_ylim(0, 1)
+            ax.set_title('Diabetes Risk Probability')
+            ax.set_xticks([0, 0.3, 0.7, 1])
+            ax.set_xticklabels(['0%', '30%', '70%', '100%'])
+            ax.set_yticks([])
+            
+            ax.axvspan(0, 0.3, color='green', alpha=0.3)
+            ax.axvspan(0.3, 0.7, color='orange', alpha=0.3)
+            ax.axvspan(0.7, 1, color='red', alpha=0.3)
+            
+            ax.plot(result['probability'], 0.5, 'ko', markersize=12)
+            
+            st.pyplot(fig)
+            
+            st.markdown("""
+            **Disclaimer:** This tool provides an estimate of diabetes risk based on machine learning models. 
+            It is not a medical diagnosis. Always consult with healthcare professionals for proper medical advice and diagnosis.
+            """)
+
+        except Exception as e:
+            st.error(f"An error occurred during prediction: {e}")
+            st.info("There might be an issue with the saved model file or the environment.")
+
 
 def show_model_performance():
     st.title("Model Performance Analysis")
@@ -245,7 +214,6 @@ def show_model_performance():
     This page presents the performance metrics and visualizations of our diabetes prediction model.
     """)
     
-    # Model comparison
     st.header("Model Comparison")
     st.markdown("""
     We trained and evaluated several machine learning models to find the best performer for diabetes prediction.
@@ -255,7 +223,6 @@ def show_model_performance():
     st.image("http://googleusercontent.com/file_content/2", 
              caption="Performance comparison of different machine learning models")
     
-    # Confusion Matrix
     st.header("Confusion Matrix")
     st.markdown("""
     The confusion matrix shows the model's prediction performance:
@@ -268,7 +235,6 @@ def show_model_performance():
     st.image("http://googleusercontent.com/file_content/5", 
              caption="Confusion Matrix showing prediction performance percentages")
     
-    # ROC Curve
     st.header("ROC Curve")
     st.markdown("""
     The Receiver Operating Characteristic (ROC) curve plots the True Positive Rate against the False Positive Rate.
@@ -278,7 +244,6 @@ def show_model_performance():
     st.image("http://googleusercontent.com/file_content/3", 
              caption="ROC Curve showing model's classification performance")
     
-    # Precision-Recall Curve
     st.header("Precision-Recall Curve")
     st.markdown("""
     The Precision-Recall curve shows the tradeoff between precision and recall for different thresholds.
