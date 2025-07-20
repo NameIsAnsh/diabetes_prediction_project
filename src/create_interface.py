@@ -14,10 +14,6 @@ from pathlib import Path
 import streamlit as st
 import shutil
 
-# This import was mentioned in the original code but the function definition was not provided.
-# Assuming it exists in a utils.py file.
-# from utils import predict_diabetes
-
 # Set page configuration
 st.set_page_config(
     page_title="Diabetes Risk Prediction",
@@ -26,31 +22,38 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# FIX: Define a placeholder function to resolve the unpickling error.
-# When joblib/pickle saves a function, it saves a reference to its name and module.
-# The error "Can't get attribute 'predict_diabetes' on <module '__main__'>" means
-# the function was saved from a script where it was defined in the main scope.
-# To load it, pickle needs to find a function with the same name in the current
-# script's main scope. This placeholder provides that name and will be
-# overwritten by the actual function loaded from the .pkl file.
-def predict_diabetes(input_data):
+# FIX: Use Streamlit's caching to load the model and other assets once.
+# This is the robust way to handle expensive resources like ML models.
+# It avoids the unpickling errors by loading the model in a stable context
+# and prevents the need for placeholder functions.
+@st.cache_resource
+def load_model_assets():
     """
-    This is a placeholder. The actual function is loaded from 'predict_function.pkl'.
+    Loads the saved prediction function and feature names using caching.
+    Returns the prediction function and feature names, or (None, None) if files are missing.
     """
-    raise NotImplementedError("Prediction function was not loaded correctly.")
+    models_dir = Path('models')
+    predict_function_path = models_dir / 'predict_function.pkl'
+    feature_names_path = models_dir / 'feature_names.pkl'
 
+    if not predict_function_path.exists() or not feature_names_path.exists():
+        return None, None
 
-# Load the prediction function
-models_dir = Path('models')
-# Ensure the models directory and necessary files exist before loading
-if not models_dir.exists() or not (models_dir / 'predict_function.pkl').exists() or not (models_dir / 'feature_names.pkl').exists():
-    st.error("Model files not found. Please ensure 'predict_function.pkl' and 'feature_names.pkl' are in the 'models' directory.")
+    try:
+        prediction_function = joblib.load(predict_function_path)
+        feature_names_list = joblib.load(feature_names_path)
+        return prediction_function, feature_names_list
+    except Exception as e:
+        st.error(f"Error loading model assets: {e}")
+        return None, None
+
+# Load the assets from the cached function
+predict_diabetes, feature_names = load_model_assets()
+
+# Stop the app if the model assets could not be loaded
+if predict_diabetes is None or feature_names is None:
+    st.error("Could not load model assets. Please check the logs and ensure model files are present.")
     st.stop()
-
-predict_diabetes = joblib.load(models_dir / 'predict_function.pkl')
-
-# Load feature names
-feature_names = joblib.load(models_dir / 'feature_names.pkl')
 
 
 # Copy visualization files to a static folder for the interface
@@ -79,14 +82,12 @@ def main():
     # Sidebar
     st.sidebar.image("https://img.freepik.com/free-vector/diabetes-round-concept_1284-37921.jpg", width=200)
     st.sidebar.title("Navigation")
-    # "Model Performance" page is now available
     page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "Model Performance", "About"])
 
     if page == "Home":
         show_home()
     elif page == "Prediction Tool":
         show_prediction_tool()
-    # The 'elif' block for "Model Performance" is now active
     elif page == "Model Performance":
         show_model_performance()
     else:
@@ -114,14 +115,12 @@ def show_home():
     Early detection and management of diabetes can prevent complications and improve quality of life.
     """)
     
-    # The "Dataset Information" section is now active
     st.markdown("""
     ### Dataset Information
     
     This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
     """)
     
-    # The correlation heatmap image is now displayed, with the path converted to a string
     st.image(str(static_dir / "correlation_heatmap.png"), caption="Correlation between different health metrics and diabetes")
     
     st.markdown("""
@@ -156,7 +155,6 @@ def show_prediction_tool():
         dpf = st.number_input("Diabetes Pedigree Function", min_value=0.0, max_value=3.0, value=0.5, format="%.3f")
         age = st.number_input("Age (years)", min_value=21, max_value=100, value=30)
 
-    # Create input dictionary
     input_data = {
         'Pregnancies': pregnancies,
         'Glucose': glucose,
@@ -168,15 +166,12 @@ def show_prediction_tool():
         'Age': age
     }
 
-    # Add predict button
     if st.button("Predict Diabetes Risk"):
-        # Make prediction
+        # The 'predict_diabetes' variable now holds the function loaded correctly via caching.
         result = predict_diabetes(input_data)
 
-        # Display result
         st.markdown("## Prediction Result")
 
-        # Create columns for result display
         res_col1, res_col2 = st.columns([1, 2])
 
         with res_col1:
@@ -187,7 +182,6 @@ def show_prediction_tool():
 
             st.metric("Risk Probability", f"{result['probability']:.2%}")
 
-            # Risk level with color coding
             if result['risk_level'] == 'High':
                 st.markdown("**Risk Level:** 🔴 High")
             elif result['risk_level'] == 'Medium':
@@ -196,7 +190,6 @@ def show_prediction_tool():
                 st.markdown("**Risk Level:** 🟢 Low")
 
         with res_col2:
-            # Recommendations based on risk level
             st.markdown("### Recommendations")
 
             if result['risk_level'] == 'High':
@@ -224,7 +217,6 @@ def show_prediction_tool():
                 - Monitor your weight
                 """)
 
-        # Display a gauge chart for the risk probability
         fig, ax = plt.subplots(figsize=(10, 2))
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
@@ -233,30 +225,25 @@ def show_prediction_tool():
         ax.set_xticklabels(['0%', '30%', '70%', '100%'])
         ax.set_yticks([])
 
-        # Add colored regions
         ax.axvspan(0, 0.3, color='green', alpha=0.3)
         ax.axvspan(0.3, 0.7, color='orange', alpha=0.3)
         ax.axvspan(0.7, 1, color='red', alpha=0.3)
 
-        # Add marker for the predicted probability
         ax.plot(result['probability'], 0.5, 'ko', markersize=12)
 
         st.pyplot(fig)
 
-        # Disclaimer
         st.markdown("""
         **Disclaimer:** This tool provides an estimate of diabetes risk based on machine learning models. 
         It is not a medical diagnosis. Always consult with healthcare professionals for proper medical advice and diagnosis.
         """)
 
-# The "Model Performance" page function is now active
 def show_model_performance():
     st.title("Model Performance Analysis")
     st.markdown("""
     This page presents the performance metrics and visualizations of our diabetes prediction model.
     """)
 
-    # Model comparison
     st.header("Model Comparison")
     st.markdown("""
     We trained and evaluated several machine learning models to find the best performer for diabetes prediction.
@@ -266,7 +253,6 @@ def show_model_performance():
     st.image(str(static_dir / "comprehensive_model_comparison.png"), 
              caption="Performance comparison of different machine learning models")
 
-    # Confusion Matrix
     st.header("Confusion Matrix")
     st.markdown("""
     The confusion matrix shows the model's prediction performance:
@@ -279,7 +265,6 @@ def show_model_performance():
     st.image(str(static_dir / "confusion_matrix_percent.png"), 
              caption="Confusion Matrix showing prediction performance percentages")
 
-    # ROC Curve
     st.header("ROC Curve")
     st.markdown("""
     The Receiver Operating Characteristic (ROC) curve plots the True Positive Rate against the False Positive Rate.
@@ -289,7 +274,6 @@ def show_model_performance():
     st.image(str(static_dir / "roc_curve.png"), 
              caption="ROC Curve showing model's classification performance")
 
-    # Precision-Recall Curve
     st.header("Precision-Recall Curve")
     st.markdown("""
     The Precision-Recall curve shows the tradeoff between precision and recall for different thresholds.
@@ -299,7 +283,6 @@ def show_model_performance():
     st.image(str(static_dir / "precision_recall_curve.png"), 
              caption="Precision-Recall Curve")
 
-    # Learning Curve
     st.header("Learning Curve")
     st.markdown("""
     The learning curve shows how the model's performance improves with more training data.
@@ -309,7 +292,6 @@ def show_model_performance():
     st.image(str(static_dir / "learning_curve.png"), 
              caption="Learning Curve showing model performance vs. training set size")
 
-    # Feature Distributions
     st.header("Feature Distributions")
     st.markdown("""
     The distribution of features between diabetic and non-diabetic patients shows clear differences,
