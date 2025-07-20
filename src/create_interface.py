@@ -26,8 +26,8 @@ st.set_page_config(
 )
 
 # --- Prediction Model Loading ---
-# Reverted to the user's original code for loading the model, as requested.
-# Note: This method can be sensitive to the environment where the file was created.
+# This section loads the model as per the user's original code.
+# This method can be sensitive to the environment where the file was created.
 try:
     models_dir = Path('models')
     predict_diabetes = joblib.load(models_dir / 'predict_function.pkl')
@@ -37,7 +37,7 @@ except FileNotFoundError:
     st.stop()
 except Exception as e:
     st.error(f"An error occurred while loading the model: {e}")
-    st.info("This can happen if the Python environment or library versions differ from where the model was saved. The recommended approach is to save only the model object, not the function.")
+    st.info("This can happen if the Python environment or library versions differ from where the model was saved.")
     st.stop()
 
 
@@ -46,15 +46,16 @@ def main():
     # Sidebar
     st.sidebar.image("https://img.freepik.com/free-vector/diabetes-round-concept_1284-37921.jpg", width=200)
     st.sidebar.title("Navigation")
-    # Re-enabled the "Model Performance" page
-    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "Model Performance", "About"])
+    # "Model Performance" page is commented out from the radio button options to prevent errors.
+    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "About"])
     
     if page == "Home":
         show_home()
     elif page == "Prediction Tool":
         show_prediction_tool()
-    elif page == "Model Performance":
-        show_model_performance()
+    # The 'elif' block for "Model Performance" is commented out so it will not be triggered.
+    # elif page == "Model Performance":
+    #     show_model_performance()
     else:
         show_about()
 
@@ -78,14 +79,16 @@ def show_home():
     If you have diabetes, your body either doesn't make enough insulin or can't use the insulin it makes as well as it should.
     
     Early detection and management of diabetes can prevent complications and improve quality of life.
-    
-    ### Dataset Information
-    
-    This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
     """)
     
-    # Using the direct URL of the uploaded image for the correlation matrix
-    st.image("http://googleusercontent.com/file_content/1", caption="Correlation between different health metrics and diabetes")
+    # The "Dataset Information" section and its corresponding image are commented out to prevent errors.
+    # st.markdown("""
+    # ### Dataset Information
+    # 
+    # This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
+    # """)
+    # 
+    # st.image("http://googleusercontent.com/file_content/1", caption="Correlation between different health metrics and diabetes")
     
     st.markdown("""
     ### Key Risk Factors
@@ -212,6 +215,7 @@ def show_prediction_tool():
         It is not a medical diagnosis. Always consult with healthcare professionals for proper medical advice and diagnosis.
         """)
 
+# The 'show_model_performance' function is not called, but is left here for future use.
 def show_model_performance():
     st.title("Model Performance Analysis")
     st.markdown("""
@@ -225,7 +229,6 @@ def show_model_performance():
     The K-Nearest Neighbors model achieved the highest F1 score and was selected as our final model.
     """)
     
-    # Using the direct URL of the uploaded image
     st.image("http://googleusercontent.com/file_content/2", 
              caption="Performance comparison of different machine learning models")
     
@@ -239,7 +242,6 @@ def show_model_performance():
     - **True Positives:** Correctly predicted diabetic cases
     """)
     
-    # Using the direct URL of the uploaded image
     st.image("http://googleusercontent.com/file_content/5", 
              caption="Confusion Matrix showing prediction performance percentages")
     
@@ -250,7 +252,6 @@ def show_model_performance():
     The Area Under the Curve (AUC) is a measure of the model's ability to distinguish between classes.
     """)
     
-    # Using the direct URL of the uploaded image
     st.image("http://googleusercontent.com/file_content/3", 
              caption="ROC Curve showing model's classification performance")
     
@@ -261,31 +262,8 @@ def show_model_performance():
     This is particularly useful for imbalanced datasets like ours.
     """)
     
-    # Using the direct URL of the uploaded image
     st.image("http://googleusercontent.com/file_content/4", 
              caption="Precision-Recall Curve")
-    
-    # The Learning Curve and Feature Distributions images were not provided,
-    # so those sections are commented out to prevent errors.
-    # # Learning Curve
-    # st.header("Learning Curve")
-    # st.markdown("""
-    # The learning curve shows how the model's performance improves with more training data.
-    # The gap between training and validation scores indicates potential overfitting or underfitting.
-    # """)
-    # 
-    # st.image("URL_FOR_LEARNING_CURVE.png", 
-    #          caption="Learning Curve showing model performance vs. training set size")
-    # 
-    # # Feature Distributions
-    # st.header("Feature Distributions")
-    # st.markdown("""
-    # The distribution of features between diabetic and non-diabetic patients shows clear differences,
-    # particularly in glucose levels, BMI, and age.
-    # """)
-    # 
-    # st.image("URL_FOR_FEATURE_DISTRIBUTIONS.png", 
-    #          caption="Distribution of features by diabetes outcome")
 
 def show_about():
     st.title("About This Project")
