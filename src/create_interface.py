@@ -26,18 +26,44 @@ st.set_page_config(
 )
 
 # --- Prediction Model Loading ---
-# This section loads the model as per the user's original code.
-# This method can be sensitive to the environment where the file was created.
-try:
-    models_dir = Path('models')
-    predict_diabetes = joblib.load(models_dir / 'predict_function.pkl')
-    feature_names = joblib.load(models_dir / 'feature_names.pkl')
-except FileNotFoundError:
-    st.error("Model files not found. Please ensure 'predict_function.pkl' and 'feature_names.pkl' are in a 'models' directory.")
-    st.stop()
-except Exception as e:
-    st.error(f"An error occurred while loading the model: {e}")
-    st.info("This can happen if the Python environment or library versions differ from where the model was saved.")
+# FIX: Define a placeholder function in the global scope.
+# This is necessary because the .pkl file was created with a reference
+# to a function named 'predict_diabetes'. Joblib needs to find a function
+# with this name in the current script to successfully load the file.
+def predict_diabetes(input_data):
+    """
+    This is a placeholder. The actual function is loaded from 'predict_function.pkl'.
+    It will be overwritten by the real function after loading.
+    """
+    raise NotImplementedError("Prediction function was not loaded correctly.")
+
+# FIX: Use Streamlit's caching to load the model assets robustly and only once.
+@st.cache_resource
+def load_model_assets():
+    """
+    Loads the saved prediction function and feature names using caching.
+    Returns the prediction function and feature names, or (None, None) if files are missing.
+    """
+    try:
+        models_dir = Path('models')
+        # The load call will now succeed because the placeholder function exists globally.
+        prediction_function = joblib.load(models_dir / 'predict_function.pkl')
+        feature_names_list = joblib.load(models_dir / 'feature_names.pkl')
+        return prediction_function, feature_names_list
+    except FileNotFoundError:
+        st.error("Model files not found. Please ensure 'predict_function.pkl' and 'feature_names.pkl' are in a 'models' directory.")
+        return None, None
+    except Exception as e:
+        st.error(f"An error occurred while loading the model: {e}")
+        st.info("This can happen if the Python environment or library versions differ from where the model was saved.")
+        return None, None
+
+# Load the assets from the cached function.
+# The global 'predict_diabetes' variable will be overwritten with the real function.
+predict_diabetes, feature_names = load_model_assets()
+
+# Stop the app if the model assets could not be loaded
+if predict_diabetes is None or feature_names is None:
     st.stop()
 
 
@@ -46,16 +72,16 @@ def main():
     # Sidebar
     st.sidebar.image("https://img.freepik.com/free-vector/diabetes-round-concept_1284-37921.jpg", width=200)
     st.sidebar.title("Navigation")
-    # "Model Performance" page is commented out from the radio button options to prevent errors.
-    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "About"])
+    # "Model Performance" page is now enabled.
+    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "Model Performance", "About"])
     
     if page == "Home":
         show_home()
     elif page == "Prediction Tool":
         show_prediction_tool()
-    # The 'elif' block for "Model Performance" is commented out so it will not be triggered.
-    # elif page == "Model Performance":
-    #     show_model_performance()
+    # The 'elif' block for "Model Performance" is now active.
+    elif page == "Model Performance":
+        show_model_performance()
     else:
         show_about()
 
@@ -81,14 +107,15 @@ def show_home():
     Early detection and management of diabetes can prevent complications and improve quality of life.
     """)
     
-    # The "Dataset Information" section and its corresponding image are commented out to prevent errors.
-    # st.markdown("""
-    # ### Dataset Information
-    # 
-    # This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
-    # """)
-    # 
-    # st.image("http://googleusercontent.com/file_content/1", caption="Correlation between different health metrics and diabetes")
+    # The "Dataset Information" section and its corresponding image are now enabled.
+    st.markdown("""
+    ### Dataset Information
+    
+    This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
+    """)
+    
+    # Using a direct URL for the image to ensure it loads correctly.
+    st.image("http://googleusercontent.com/file_content/1", caption="Correlation between different health metrics and diabetes")
     
     st.markdown("""
     ### Key Risk Factors
@@ -136,7 +163,7 @@ def show_prediction_tool():
     
     # Add predict button
     if st.button("Predict Diabetes Risk"):
-        # Make prediction
+        # Make prediction using the loaded function
         result = predict_diabetes(input_data)
         
         # Display result
@@ -215,7 +242,6 @@ def show_prediction_tool():
         It is not a medical diagnosis. Always consult with healthcare professionals for proper medical advice and diagnosis.
         """)
 
-# The 'show_model_performance' function is not called, but is left here for future use.
 def show_model_performance():
     st.title("Model Performance Analysis")
     st.markdown("""
