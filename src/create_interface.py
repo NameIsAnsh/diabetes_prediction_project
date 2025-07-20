@@ -58,28 +58,26 @@ def load_model_assets():
         st.info("This can happen if the Python environment or library versions differ from where the model was saved.")
         return None, None
 
-# Load the assets from the cached function.
-# The global 'predict_diabetes' variable will be overwritten with the real function.
-predict_diabetes, feature_names = load_model_assets()
-
-# Stop the app if the model assets could not be loaded
-if predict_diabetes is None or feature_names is None:
-    st.stop()
-
-
 # Define the app
 def main():
+    # Load the model assets inside the main function.
+    # This ensures they are loaded correctly before being used.
+    prediction_function, feature_names = load_model_assets()
+
+    # Stop the app if the model assets could not be loaded
+    if prediction_function is None or feature_names is None:
+        st.stop()
+
     # Sidebar
     st.sidebar.image("https://img.freepik.com/free-vector/diabetes-round-concept_1284-37921.jpg", width=200)
     st.sidebar.title("Navigation")
-    # "Model Performance" page is now enabled.
     page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "Model Performance", "About"])
     
     if page == "Home":
         show_home()
     elif page == "Prediction Tool":
-        show_prediction_tool()
-    # The 'elif' block for "Model Performance" is now active.
+        # Pass the loaded function as an argument.
+        show_prediction_tool(prediction_function)
     elif page == "Model Performance":
         show_model_performance()
     else:
@@ -107,14 +105,12 @@ def show_home():
     Early detection and management of diabetes can prevent complications and improve quality of life.
     """)
     
-    # The "Dataset Information" section and its corresponding image are now enabled.
     st.markdown("""
     ### Dataset Information
     
     This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
     """)
     
-    # Using a direct URL for the image to ensure it loads correctly.
     st.image("http://googleusercontent.com/file_content/1", caption="Correlation between different health metrics and diabetes")
     
     st.markdown("""
@@ -131,7 +127,8 @@ def show_home():
     Use the prediction tool to assess your personal risk based on these and other factors.
     """)
 
-def show_prediction_tool():
+# FIX: The function now accepts the loaded prediction function as an argument.
+def show_prediction_tool(predict_diabetes_func):
     st.title("Diabetes Risk Prediction Tool")
     st.markdown("Enter your health information below to get a personalized diabetes risk assessment.")
     
@@ -163,8 +160,8 @@ def show_prediction_tool():
     
     # Add predict button
     if st.button("Predict Diabetes Risk"):
-        # Make prediction using the loaded function
-        result = predict_diabetes(input_data)
+        # Make prediction using the function passed as an argument.
+        result = predict_diabetes_func(input_data)
         
         # Display result
         st.markdown("## Prediction Result")
