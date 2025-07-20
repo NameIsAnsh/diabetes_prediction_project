@@ -22,10 +22,20 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# FIX: Use Streamlit's caching to load the model and other assets once.
+# FIX 1: Define a placeholder function in the global scope.
+# This is necessary because the .pkl file was created with a reference
+# to a function named 'predict_diabetes' in its main script. Joblib needs
+# to find a function with this name in the current script to load the file.
+def predict_diabetes(input_data):
+    """
+    This is a placeholder. The actual function is loaded from 'predict_function.pkl'.
+    It will be overwritten by the real function after loading.
+    """
+    raise NotImplementedError("Prediction function was not loaded correctly.")
+
+
+# FIX 2: Use Streamlit's caching to load the model and other assets once.
 # This is the robust way to handle expensive resources like ML models.
-# It avoids the unpickling errors by loading the model in a stable context
-# and prevents the need for placeholder functions.
 @st.cache_resource
 def load_model_assets():
     """
@@ -37,22 +47,26 @@ def load_model_assets():
     feature_names_path = models_dir / 'feature_names.pkl'
 
     if not predict_function_path.exists() or not feature_names_path.exists():
+        st.error("Model files ('predict_function.pkl' or 'feature_names.pkl') not found in 'models' directory.")
         return None, None
 
     try:
+        # This load call will now succeed because the placeholder function exists globally.
         prediction_function = joblib.load(predict_function_path)
         feature_names_list = joblib.load(feature_names_path)
         return prediction_function, feature_names_list
     except Exception as e:
+        # The error message from the exception is now more informative.
         st.error(f"Error loading model assets: {e}")
         return None, None
 
-# Load the assets from the cached function
+# Load the assets from the cached function.
+# The 'predict_diabetes' global variable will be overwritten with the real function.
 predict_diabetes, feature_names = load_model_assets()
 
 # Stop the app if the model assets could not be loaded
 if predict_diabetes is None or feature_names is None:
-    st.error("Could not load model assets. Please check the logs and ensure model files are present.")
+    st.error("Could not load model assets. Please check the logs and ensure model files are present and not corrupted.")
     st.stop()
 
 
