@@ -96,14 +96,16 @@ def main():
     # Sidebar
     st.sidebar.image("https://img.freepik.com/free-vector/diabetes-round-concept_1284-37921.jpg", width=200)
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "Model Performance", "About"])
+    # "Model Performance" page is commented out to prevent errors
+    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "About"])
 
     if page == "Home":
         show_home()
     elif page == "Prediction Tool":
         show_prediction_tool()
-    elif page == "Model Performance":
-        show_model_performance()
+    # The 'elif' block for "Model Performance" is commented out
+    # elif page == "Model Performance":
+    #     show_model_performance()
     else:
         show_about()
 
@@ -129,13 +131,15 @@ def show_home():
     Early detection and management of diabetes can prevent complications and improve quality of life.
     """)
     
-    st.markdown("""
-    ### Dataset Information
+    # The "Dataset Information" section is commented out to prevent errors
+    # st.markdown("""
+    # ### Dataset Information
+    # 
+    # This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
+    # """)
     
-    This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
-    """)
-    
-    st.image(str(static_dir / "correlation_heatmap.png"), caption="Correlation between different health metrics and diabetes")
+    # The correlation heatmap image is commented out to prevent errors
+    # st.image(str(static_dir / "correlation_heatmap.png"), caption="Correlation between different health metrics and diabetes")
     
     st.markdown("""
     ### Key Risk Factors
@@ -252,6 +256,7 @@ def show_prediction_tool():
         It is not a medical diagnosis. Always consult with healthcare professionals for proper medical advice and diagnosis.
         """)
 
+# The "Model Performance" page function is left here but is not called
 def show_model_performance():
     st.title("Model Performance Analysis")
     st.markdown("""
