@@ -64,16 +64,16 @@ def main():
     # Sidebar
     st.sidebar.image("https://img.freepik.com/free-vector/diabetes-round-concept_1284-37921.jpg", width=200)
     st.sidebar.title("Navigation")
-    # "Model Performance" page is commented out from the radio button options
-    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "About"])
+    # "Model Performance" page is now available
+    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "Model Performance", "About"])
 
     if page == "Home":
         show_home()
     elif page == "Prediction Tool":
         show_prediction_tool()
-    # The 'elif' block for "Model Performance" is commented out
-    # elif page == "Model Performance":
-    #     show_model_performance()
+    # The 'elif' block for "Model Performance" is now active
+    elif page == "Model Performance":
+        show_model_performance()
     else:
         show_about()
 
@@ -99,15 +99,15 @@ def show_home():
     Early detection and management of diabetes can prevent complications and improve quality of life.
     """)
     
-    # The "Dataset Information" section is commented out
-    # st.markdown("""
-    # ### Dataset Information
-    # 
-    # This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
-    # """)
+    # The "Dataset Information" section is now active
+    st.markdown("""
+    ### Dataset Information
     
-    # The correlation heatmap image is commented out
-    # st.image(str(static_dir / "correlation_heatmap.png"), caption="Correlation between different health metrics and diabetes")
+    This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
+    """)
+    
+    # The correlation heatmap image is now displayed, with the path converted to a string
+    st.image(str(static_dir / "correlation_heatmap.png"), caption="Correlation between different health metrics and diabetes")
     
     st.markdown("""
     ### Key Risk Factors
@@ -234,75 +234,75 @@ def show_prediction_tool():
         It is not a medical diagnosis. Always consult with healthcare professionals for proper medical advice and diagnosis.
         """)
 
-# The "Model Performance" page function is now commented out
-# def show_model_performance():
-#     st.title("Model Performance Analysis")
-#     st.markdown("""
-#     This page presents the performance metrics and visualizations of our diabetes prediction model.
-#     """)
-# 
-#     # Model comparison
-#     st.header("Model Comparison")
-#     st.markdown("""
-#     We trained and evaluated several machine learning models to find the best performer for diabetes prediction.
-#     The K-Nearest Neighbors model achieved the highest F1 score and was selected as our final model.
-#     """)
-# 
-#     st.image(str(static_dir / "comprehensive_model_comparison.png"), 
-#              caption="Performance comparison of different machine learning models")
-# 
-#     # Confusion Matrix
-#     st.header("Confusion Matrix")
-#     st.markdown("""
-#     The confusion matrix shows the model's prediction performance:
-#     - **True Negatives:** Correctly predicted non-diabetic cases
-#     - **False Positives:** Non-diabetic cases incorrectly predicted as diabetic
-#     - **False Negatives:** Diabetic cases incorrectly predicted as non-diabetic
-#     - **True Positives:** Correctly predicted diabetic cases
-#     """)
-# 
-#     st.image(str(static_dir / "confusion_matrix_percent.png"), 
-#              caption="Confusion Matrix showing prediction performance percentages")
-# 
-#     # ROC Curve
-#     st.header("ROC Curve")
-#     st.markdown("""
-#     The Receiver Operating Characteristic (ROC) curve plots the True Positive Rate against the False Positive Rate.
-#     The Area Under the Curve (AUC) is a measure of the model's ability to distinguish between classes.
-#     """)
-# 
-#     st.image(str(static_dir / "roc_curve.png"), 
-#              caption="ROC Curve showing model's classification performance")
-# 
-#     # Precision-Recall Curve
-#     st.header("Precision-Recall Curve")
-#     st.markdown("""
-#     The Precision-Recall curve shows the tradeoff between precision and recall for different thresholds.
-#     This is particularly useful for imbalanced datasets like ours.
-#     """)
-# 
-#     st.image(str(static_dir / "precision_recall_curve.png"), 
-#              caption="Precision-Recall Curve")
-# 
-#     # Learning Curve
-#     st.header("Learning Curve")
-#     st.markdown("""
-#     The learning curve shows how the model's performance improves with more training data.
-#     The gap between training and validation scores indicates potential overfitting or underfitting.
-#     """)
-# 
-#     st.image(str(static_dir / "learning_curve.png"), 
-#              caption="Learning Curve showing model performance vs. training set size")
-# 
-#     # Feature Distributions
-#     st.header("Feature Distributions")
-#     st.markdown("""
-#     The distribution of features between diabetic and non-diabetic patients shows clear differences,
-#     particularly in glucose levels, BMI, and age.
-#     """)
-# 
-#     st.image(str(static_dir / "feature_distributions.png"), 
-#              caption="Distribution of features by diabetes outcome")
+# The "Model Performance" page function is now active
+def show_model_performance():
+    st.title("Model Performance Analysis")
+    st.markdown("""
+    This page presents the performance metrics and visualizations of our diabetes prediction model.
+    """)
+
+    # Model comparison
+    st.header("Model Comparison")
+    st.markdown("""
+    We trained and evaluated several machine learning models to find the best performer for diabetes prediction.
+    The K-Nearest Neighbors model achieved the highest F1 score and was selected as our final model.
+    """)
+
+    st.image(str(static_dir / "comprehensive_model_comparison.png"), 
+             caption="Performance comparison of different machine learning models")
+
+    # Confusion Matrix
+    st.header("Confusion Matrix")
+    st.markdown("""
+    The confusion matrix shows the model's prediction performance:
+    - **True Negatives:** Correctly predicted non-diabetic cases
+    - **False Positives:** Non-diabetic cases incorrectly predicted as diabetic
+    - **False Negatives:** Diabetic cases incorrectly predicted as non-diabetic
+    - **True Positives:** Correctly predicted diabetic cases
+    """)
+
+    st.image(str(static_dir / "confusion_matrix_percent.png"), 
+             caption="Confusion Matrix showing prediction performance percentages")
+
+    # ROC Curve
+    st.header("ROC Curve")
+    st.markdown("""
+    The Receiver Operating Characteristic (ROC) curve plots the True Positive Rate against the False Positive Rate.
+    The Area Under the Curve (AUC) is a measure of the model's ability to distinguish between classes.
+    """)
+
+    st.image(str(static_dir / "roc_curve.png"), 
+             caption="ROC Curve showing model's classification performance")
+
+    # Precision-Recall Curve
+    st.header("Precision-Recall Curve")
+    st.markdown("""
+    The Precision-Recall curve shows the tradeoff between precision and recall for different thresholds.
+    This is particularly useful for imbalanced datasets like ours.
+    """)
+
+    st.image(str(static_dir / "precision_recall_curve.png"), 
+             caption="Precision-Recall Curve")
+
+    # Learning Curve
+    st.header("Learning Curve")
+    st.markdown("""
+    The learning curve shows how the model's performance improves with more training data.
+    The gap between training and validation scores indicates potential overfitting or underfitting.
+    """)
+
+    st.image(str(static_dir / "learning_curve.png"), 
+             caption="Learning Curve showing model performance vs. training set size")
+
+    # Feature Distributions
+    st.header("Feature Distributions")
+    st.markdown("""
+    The distribution of features between diabetic and non-diabetic patients shows clear differences,
+    particularly in glucose levels, BMI, and age.
+    """)
+
+    st.image(str(static_dir / "feature_distributions.png"), 
+             caption="Distribution of features by diabetes outcome")
 
 def show_about():
     st.title("About This Project")
