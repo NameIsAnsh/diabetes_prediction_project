@@ -13,6 +13,9 @@ import seaborn as sns
 from pathlib import Path
 import streamlit as st
 import shutil
+# The user's original code included this import.
+# It's assumed to exist in the project structure.
+# from utils import predict_diabetes
 
 # Set page configuration
 st.set_page_config(
@@ -22,90 +25,36 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# FIX 1: Define a placeholder function in the global scope.
-# This is necessary because the .pkl file was created with a reference
-# to a function named 'predict_diabetes' in its main script. Joblib needs
-# to find a function with this name in the current script to load the file.
-def predict_diabetes(input_data):
-    """
-    This is a placeholder. The actual function is loaded from 'predict_function.pkl'.
-    It will be overwritten by the real function after loading.
-    """
-    raise NotImplementedError("Prediction function was not loaded correctly.")
-
-
-# FIX 2: Use Streamlit's caching to load the model and other assets once.
-# This is the robust way to handle expensive resources like ML models.
-@st.cache_resource
-def load_model_assets():
-    """
-    Loads the saved prediction function and feature names using caching.
-    Returns the prediction function and feature names, or (None, None) if files are missing.
-    """
+# --- Prediction Model Loading ---
+# Reverted to the user's original code for loading the model, as requested.
+# Note: This method can be sensitive to the environment where the file was created.
+try:
     models_dir = Path('models')
-    predict_function_path = models_dir / 'predict_function.pkl'
-    feature_names_path = models_dir / 'feature_names.pkl'
-
-    if not predict_function_path.exists() or not feature_names_path.exists():
-        st.error("Model files ('predict_function.pkl' or 'feature_names.pkl') not found in 'models' directory.")
-        return None, None
-
-    try:
-        # This load call will now succeed because the placeholder function exists globally.
-        prediction_function = joblib.load(predict_function_path)
-        feature_names_list = joblib.load(feature_names_path)
-        return prediction_function, feature_names_list
-    except Exception as e:
-        # The error message from the exception is now more informative.
-        st.error(f"Error loading model assets: {e}")
-        return None, None
-
-# Load the assets from the cached function.
-# The 'predict_diabetes' global variable will be overwritten with the real function.
-predict_diabetes, feature_names = load_model_assets()
-
-# Stop the app if the model assets could not be loaded
-if predict_diabetes is None or feature_names is None:
-    st.error("Could not load model assets. Please check the logs and ensure model files are present and not corrupted.")
+    predict_diabetes = joblib.load(models_dir / 'predict_function.pkl')
+    feature_names = joblib.load(models_dir / 'feature_names.pkl')
+except FileNotFoundError:
+    st.error("Model files not found. Please ensure 'predict_function.pkl' and 'feature_names.pkl' are in a 'models' directory.")
+    st.stop()
+except Exception as e:
+    st.error(f"An error occurred while loading the model: {e}")
+    st.info("This can happen if the Python environment or library versions differ from where the model was saved. The recommended approach is to save only the model object, not the function.")
     st.stop()
 
-
-# Copy visualization files to a static folder for the interface
-static_dir = Path('visualization/static')
-static_dir.mkdir(exist_ok=True, parents=True)
-
-# Copy key visualization files
-viz_files = [
-    'models/evaluation/comprehensive_model_comparison.png',
-    'models/evaluation/confusion_matrix_percent.png',
-    'models/evaluation/roc_curve.png',
-    'models/evaluation/precision_recall_curve.png',
-    'models/evaluation/learning_curve.png',
-    'visualization/correlation_heatmap.png',
-    'visualization/feature_distributions.png'
-]
-
-# Verify files exist before copying
-for file in viz_files:
-    src = Path(file)
-    if src.exists():
-        shutil.copy(src, static_dir)
 
 # Define the app
 def main():
     # Sidebar
     st.sidebar.image("https://img.freepik.com/free-vector/diabetes-round-concept_1284-37921.jpg", width=200)
     st.sidebar.title("Navigation")
-    # "Model Performance" page is commented out to prevent errors
-    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "About"])
-
+    # Re-enabled the "Model Performance" page
+    page = st.sidebar.radio("Go to", ["Home", "Prediction Tool", "Model Performance", "About"])
+    
     if page == "Home":
         show_home()
     elif page == "Prediction Tool":
         show_prediction_tool()
-    # The 'elif' block for "Model Performance" is commented out
-    # elif page == "Model Performance":
-    #     show_model_performance()
+    elif page == "Model Performance":
+        show_model_performance()
     else:
         show_about()
 
@@ -113,66 +62,64 @@ def show_home():
     st.title("Diabetes Risk Prediction System")
     st.markdown("""
     ## Welcome to the Diabetes Risk Assessment Tool
-
+    
     This application uses machine learning to predict the risk of diabetes based on several health indicators.
-
+    
     ### How to use this tool:
-
+    
     1. Navigate to the **Prediction Tool** page using the sidebar
     2. Enter your health information
     3. Click "Predict" to see your diabetes risk assessment
     4. Review the results and recommendations
-
+    
     ### About Diabetes
-
+    
     Diabetes is a chronic health condition that affects how your body turns food into energy. 
     If you have diabetes, your body either doesn't make enough insulin or can't use the insulin it makes as well as it should.
-
+    
     Early detection and management of diabetes can prevent complications and improve quality of life.
+    
+    ### Dataset Information
+    
+    This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
     """)
     
-    # The "Dataset Information" section is commented out to prevent errors
-    # st.markdown("""
-    # ### Dataset Information
-    # 
-    # This prediction model was trained on the Pima Indians Diabetes Dataset, which includes health metrics from female patients of Pima Indian heritage.
-    # """)
-    
-    # The correlation heatmap image is commented out to prevent errors
-    # st.image(str(static_dir / "correlation_heatmap.png"), caption="Correlation between different health metrics and diabetes")
+    # Using the direct URL of the uploaded image for the correlation matrix
+    st.image("http://googleusercontent.com/file_content/1", caption="Correlation between different health metrics and diabetes")
     
     st.markdown("""
     ### Key Risk Factors
-
+    
     Based on our analysis, the following factors have the strongest correlation with diabetes risk:
-
+    
     1. **Glucose Level**: Higher blood glucose levels are strongly associated with diabetes
     2. **BMI (Body Mass Index)**: Higher BMI values indicate increased risk
     3. **Age**: Risk increases with age
     4. **Diabetes Pedigree Function**: Family history of diabetes increases risk
     5. **Number of Pregnancies**: More pregnancies are associated with higher risk in this dataset
-
+    
     Use the prediction tool to assess your personal risk based on these and other factors.
     """)
 
 def show_prediction_tool():
     st.title("Diabetes Risk Prediction Tool")
     st.markdown("Enter your health information below to get a personalized diabetes risk assessment.")
-
+    
     col1, col2 = st.columns(2)
-
+    
     with col1:
         pregnancies = st.number_input("Number of Pregnancies", min_value=0, max_value=20, value=0)
         glucose = st.number_input("Glucose Level (mg/dL)", min_value=0, max_value=300, value=120)
         blood_pressure = st.number_input("Blood Pressure (mm Hg)", min_value=0, max_value=200, value=70)
         skin_thickness = st.number_input("Skin Thickness (mm)", min_value=0, max_value=100, value=20)
-
+    
     with col2:
         insulin = st.number_input("Insulin Level (mu U/ml)", min_value=0, max_value=1000, value=80)
         bmi = st.number_input("BMI (kg/m²)", min_value=0.0, max_value=70.0, value=25.0, format="%.1f")
         dpf = st.number_input("Diabetes Pedigree Function", min_value=0.0, max_value=3.0, value=0.5, format="%.3f")
         age = st.number_input("Age (years)", min_value=21, max_value=100, value=30)
-
+    
+    # Create input dictionary
     input_data = {
         'Pregnancies': pregnancies,
         'Glucose': glucose,
@@ -183,33 +130,38 @@ def show_prediction_tool():
         'DiabetesPedigreeFunction': dpf,
         'Age': age
     }
-
+    
+    # Add predict button
     if st.button("Predict Diabetes Risk"):
-        # The 'predict_diabetes' variable now holds the function loaded correctly via caching.
+        # Make prediction
         result = predict_diabetes(input_data)
-
+        
+        # Display result
         st.markdown("## Prediction Result")
-
+        
+        # Create columns for result display
         res_col1, res_col2 = st.columns([1, 2])
-
+        
         with res_col1:
             if result['prediction'] == 1:
                 st.error("**Prediction: Positive for Diabetes Risk**")
             else:
                 st.success("**Prediction: Negative for Diabetes Risk**")
-
+            
             st.metric("Risk Probability", f"{result['probability']:.2%}")
-
+            
+            # Risk level with color coding
             if result['risk_level'] == 'High':
                 st.markdown("**Risk Level:** 🔴 High")
             elif result['risk_level'] == 'Medium':
                 st.markdown("**Risk Level:** 🟠 Medium")
             else:
                 st.markdown("**Risk Level:** 🟢 Low")
-
+        
         with res_col2:
+            # Recommendations based on risk level
             st.markdown("### Recommendations")
-
+            
             if result['risk_level'] == 'High':
                 st.markdown("""
                 - **Consult a healthcare provider immediately** for proper diagnosis and treatment
@@ -234,7 +186,8 @@ def show_prediction_tool():
                 - Eat a balanced diet
                 - Monitor your weight
                 """)
-
+        
+        # Display a gauge chart for the risk probability
         fig, ax = plt.subplots(figsize=(10, 2))
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
@@ -242,36 +195,41 @@ def show_prediction_tool():
         ax.set_xticks([0, 0.3, 0.7, 1])
         ax.set_xticklabels(['0%', '30%', '70%', '100%'])
         ax.set_yticks([])
-
+        
+        # Add colored regions
         ax.axvspan(0, 0.3, color='green', alpha=0.3)
         ax.axvspan(0.3, 0.7, color='orange', alpha=0.3)
         ax.axvspan(0.7, 1, color='red', alpha=0.3)
-
+        
+        # Add marker for the predicted probability
         ax.plot(result['probability'], 0.5, 'ko', markersize=12)
-
+        
         st.pyplot(fig)
-
+        
+        # Disclaimer
         st.markdown("""
         **Disclaimer:** This tool provides an estimate of diabetes risk based on machine learning models. 
         It is not a medical diagnosis. Always consult with healthcare professionals for proper medical advice and diagnosis.
         """)
 
-# The "Model Performance" page function is left here but is not called
 def show_model_performance():
     st.title("Model Performance Analysis")
     st.markdown("""
     This page presents the performance metrics and visualizations of our diabetes prediction model.
     """)
-
+    
+    # Model comparison
     st.header("Model Comparison")
     st.markdown("""
     We trained and evaluated several machine learning models to find the best performer for diabetes prediction.
     The K-Nearest Neighbors model achieved the highest F1 score and was selected as our final model.
     """)
-
-    st.image(str(static_dir / "comprehensive_model_comparison.png"), 
+    
+    # Using the direct URL of the uploaded image
+    st.image("http://googleusercontent.com/file_content/2", 
              caption="Performance comparison of different machine learning models")
-
+    
+    # Confusion Matrix
     st.header("Confusion Matrix")
     st.markdown("""
     The confusion matrix shows the model's prediction performance:
@@ -280,79 +238,88 @@ def show_model_performance():
     - **False Negatives:** Diabetic cases incorrectly predicted as non-diabetic
     - **True Positives:** Correctly predicted diabetic cases
     """)
-
-    st.image(str(static_dir / "confusion_matrix_percent.png"), 
+    
+    # Using the direct URL of the uploaded image
+    st.image("http://googleusercontent.com/file_content/5", 
              caption="Confusion Matrix showing prediction performance percentages")
-
+    
+    # ROC Curve
     st.header("ROC Curve")
     st.markdown("""
     The Receiver Operating Characteristic (ROC) curve plots the True Positive Rate against the False Positive Rate.
     The Area Under the Curve (AUC) is a measure of the model's ability to distinguish between classes.
     """)
-
-    st.image(str(static_dir / "roc_curve.png"), 
+    
+    # Using the direct URL of the uploaded image
+    st.image("http://googleusercontent.com/file_content/3", 
              caption="ROC Curve showing model's classification performance")
-
+    
+    # Precision-Recall Curve
     st.header("Precision-Recall Curve")
     st.markdown("""
     The Precision-Recall curve shows the tradeoff between precision and recall for different thresholds.
     This is particularly useful for imbalanced datasets like ours.
     """)
-
-    st.image(str(static_dir / "precision_recall_curve.png"), 
+    
+    # Using the direct URL of the uploaded image
+    st.image("http://googleusercontent.com/file_content/4", 
              caption="Precision-Recall Curve")
-
-    st.header("Learning Curve")
-    st.markdown("""
-    The learning curve shows how the model's performance improves with more training data.
-    The gap between training and validation scores indicates potential overfitting or underfitting.
-    """)
-
-    st.image(str(static_dir / "learning_curve.png"), 
-             caption="Learning Curve showing model performance vs. training set size")
-
-    st.header("Feature Distributions")
-    st.markdown("""
-    The distribution of features between diabetic and non-diabetic patients shows clear differences,
-    particularly in glucose levels, BMI, and age.
-    """)
-
-    st.image(str(static_dir / "feature_distributions.png"), 
-             caption="Distribution of features by diabetes outcome")
+    
+    # The Learning Curve and Feature Distributions images were not provided,
+    # so those sections are commented out to prevent errors.
+    # # Learning Curve
+    # st.header("Learning Curve")
+    # st.markdown("""
+    # The learning curve shows how the model's performance improves with more training data.
+    # The gap between training and validation scores indicates potential overfitting or underfitting.
+    # """)
+    # 
+    # st.image("URL_FOR_LEARNING_CURVE.png", 
+    #          caption="Learning Curve showing model performance vs. training set size")
+    # 
+    # # Feature Distributions
+    # st.header("Feature Distributions")
+    # st.markdown("""
+    # The distribution of features between diabetic and non-diabetic patients shows clear differences,
+    # particularly in glucose levels, BMI, and age.
+    # """)
+    # 
+    # st.image("URL_FOR_FEATURE_DISTRIBUTIONS.png", 
+    #          caption="Distribution of features by diabetes outcome")
 
 def show_about():
     st.title("About This Project")
     st.markdown("""
     ## Diabetes Risk Prediction System
-
+    
     This project implements a machine learning approach to predict diabetes risk based on health metrics.
-
+    
     ### Project Components
-
+    
     1. **Data Collection and Analysis**: Using the Pima Indians Diabetes Dataset
     2. **Machine Learning Models**: Implementation of various classification algorithms
     3. **Model Evaluation**: Comprehensive performance assessment
     4. **Web Interface**: User-friendly tool for diabetes risk prediction
-
+    
     ### Technologies Used
-
+    
     - **Python**: Core programming language
     - **Scikit-learn**: Machine learning library
     - **Pandas & NumPy**: Data manipulation
     - **Matplotlib & Seaborn**: Data visualization
     - **Streamlit**: Web interface development
-
+    
     ### Research Background
-
+    
     This project is based on research in machine learning applications for healthcare, specifically in diabetes prediction.
     The approach follows methodologies described in recent literature on predictive modeling for chronic diseases.
-
+    
     ### References
-
+    
     For a complete list of references and research papers that informed this project, please refer to the project documentation.
-
+    
     ### Disclaimer
-
+    
     This tool is for educational and research purposes only. It is not intended to replace professional medical advice, diagnosis, or treatment.
     Always consult qualified healthcare providers with any questions regarding medical conditions.
     """)
