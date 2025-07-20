@@ -25,8 +25,61 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- NOTE: Model loading is now handled directly inside the prediction function ---
-# This is a more direct approach to avoid issues with Streamlit's script re-runs.
+# --- Model Loading ---
+# FIX: Use Streamlit's caching to load the model robustly and only once.
+# This is the recommended practice for loading heavy resources.
+@st.cache_resource
+def load_model():
+    """
+    Loads the saved model pipeline.
+    NOTE: This assumes the saved file is the model/pipeline object itself,
+    not a function. This is the standard practice to avoid loading errors.
+    If 'predict_function.pkl' contains the model object, it will work.
+    """
+    try:
+        models_dir = Path('models')
+        # We load the file that contains the trained model/pipeline object.
+        model_pipeline = joblib.load(models_dir / 'predict_function.pkl')
+        return model_pipeline
+    except FileNotFoundError:
+        st.error("Model file ('predict_function.pkl') not found in the 'models' directory.")
+        return None
+    except Exception as e:
+        st.error(f"An error occurred while loading the model: {e}")
+        st.info("This error can occur if the saved file is a function instead of a model object. The recommended solution is to save only the trained scikit-learn pipeline/model.")
+        return None
+
+# Load the model using the cached function
+model_pipeline = load_model()
+
+# --- Prediction Logic ---
+# FIX: The prediction logic is now defined directly within the Streamlit app.
+# This makes the app self-contained and avoids dependency issues from the saved file.
+def run_prediction(input_data, pipeline):
+    """
+    Takes user input and the loaded model pipeline to return a prediction.
+    """
+    if pipeline is None:
+        st.error("Model is not loaded. Cannot make a prediction.")
+        return None
+
+    # Convert the input dictionary to a DataFrame for the model
+    input_df = pd.DataFrame([input_data])
+    
+    # Use the loaded pipeline to predict
+    prediction = pipeline.predict(input_df)[0]
+    probability = pipeline.predict_proba(input_df)[0][1]  # Probability of '1' (diabetes)
+
+    # Determine risk level based on probability
+    if probability > 0.7:
+        risk_level = 'High'
+    elif probability > 0.3:
+        risk_level = 'Medium'
+    else:
+        risk_level = 'Low'
+    
+    return {'prediction': prediction, 'probability': probability, 'risk_level': risk_level}
+
 
 # Define the app
 def main():
@@ -38,7 +91,6 @@ def main():
     if page == "Home":
         show_home()
     elif page == "Prediction Tool":
-        # The prediction function is no longer passed as an argument.
         show_prediction_tool()
     elif page == "Model Performance":
         show_model_performance()
@@ -89,7 +141,6 @@ def show_home():
     Use the prediction tool to assess your personal risk based on these and other factors.
     """)
 
-# FIX: The function now loads the model directly when needed.
 def show_prediction_tool():
     st.title("Diabetes Risk Prediction Tool")
     st.markdown("Enter your health information below to get a personalized diabetes risk assessment.")
@@ -122,18 +173,10 @@ def show_prediction_tool():
     
     # Add predict button
     if st.button("Predict Diabetes Risk"):
-        try:
-            # Load the placeholder function definition to satisfy joblib
-            def predict_diabetes(input_data):
-                pass
-            
-            # Load the actual function from the file right before using it.
-            models_dir = Path('models')
-            predict_diabetes_func = joblib.load(models_dir / 'predict_function.pkl')
-            
-            # Make prediction using the loaded function.
-            result = predict_diabetes_func(input_data)
-            
+        # Make prediction using the new self-contained function
+        result = run_prediction(input_data, model_pipeline)
+        
+        if result:
             # Display result
             st.markdown("## Prediction Result")
             
@@ -202,11 +245,6 @@ def show_prediction_tool():
             **Disclaimer:** This tool provides an estimate of diabetes risk based on machine learning models. 
             It is not a medical diagnosis. Always consult with healthcare professionals for proper medical advice and diagnosis.
             """)
-
-        except Exception as e:
-            st.error(f"An error occurred during prediction: {e}")
-            st.info("There might be an issue with the saved model file or the environment.")
-
 
 def show_model_performance():
     st.title("Model Performance Analysis")
